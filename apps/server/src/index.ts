@@ -1,7 +1,9 @@
 import "dotenv/config";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
+import { openapi } from "@elysiajs/openapi";
 import { auth } from "@SteamRecommender/auth";
+import { plugin as htmlPlugin } from "./routes/html";
 
 const app = new Elysia()
 	.use(
@@ -12,6 +14,8 @@ const app = new Elysia()
 			credentials: true,
 		}),
 	)
+	.use(openapi())
+	.use(htmlPlugin({ prefix: "/html" }))
 	.all("/api/auth/*", async (context) => {
 		const { request, status } = context;
 		if (["POST", "GET"].includes(request.method)) {
