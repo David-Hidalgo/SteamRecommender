@@ -69,3 +69,30 @@ SteamRecommender/
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 - `bun check`: Run Biome formatting and linting
+
+
+### Divisoón de tareas
+
+Base de Datos
+
+|tarea|quien|
+|:---:|:---:|
+|Crear Esquema bd|quien|
+|Poblar BD|quien|
+|Recomendador |quien|
+
+Backend Endpoints
+
+|tarea|quien|
+|:---:|:---:|
+|Juegos Top|quien|
+|Juegos * Usuario|quien|
+|Recomendados * Usuario|quien|
+
+Backend Endpoints
+
+|tarea|quien|
+|:---:|:---:|
+|Login|quien|
+|Interfaz Principal|quien|
+|Usuario|quien|
