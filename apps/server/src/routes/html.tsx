@@ -1,5 +1,6 @@
 import { html, Html } from "@elysiajs/html";
 import { Elysia } from "elysia";
+import Saludos from "./saludos.html" with { type: "text" };;
 
 export const plugin = <T extends string>(config: { prefix: T }) =>
 	new Elysia({
@@ -30,4 +31,5 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					<h1>Hello World TSX</h1>
 				</body>
 			</html>
-		));
+		))
+		.get("/Saludos", () => Saludos)
