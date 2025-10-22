@@ -6,4 +6,6 @@ export default defineConfig({
 	outDir: "./dist",
 	clean: true,
 	noExternal: [/@SteamRecommender\/.*/],
+	external: ["public/index.html", "public/Frontend/games.html"],
+	copy: [{ from: "public", to: "dist" }],
 });

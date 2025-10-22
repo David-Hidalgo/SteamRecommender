@@ -4,7 +4,10 @@ import { client } from "../index";
 // Tipos mínimos para la API de Steam
 type SteamApp = { appid: number; name: string };
 type AppDetailsData = { type?: string } & Record<string, unknown>;
-type AppDetailsResponse = Record<string, { success: boolean; data?: AppDetailsData }>;
+type AppDetailsResponse = Record<
+	string,
+	{ success: boolean; data?: AppDetailsData }
+>;
 
 // --- CONFIGURACIÓN ---
 const STEAM_API_URL = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
@@ -17,11 +20,11 @@ async function importarJuegosDeSteam() {
 	console.log("🚀 Iniciando la importación de juegos de Steam...");
 
 	try {
-	    let aplicaciones: Set<SteamApp>;
+		let aplicaciones: Set<SteamApp>;
 		const fileExists = await file("./steam_apps.json").exists();
 		if (fileExists) {
-		    const arr = (await file("./steam_apps.json").json()) as SteamApp[];
-		    aplicaciones = new Set<SteamApp>(arr);
+			const arr = (await file("./steam_apps.json").json()) as SteamApp[];
+			aplicaciones = new Set<SteamApp>(arr);
 		} else {
 			// 1. OBTENER DATOS DE LA API DE STEAM
 			console.log(

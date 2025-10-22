@@ -1,6 +1,8 @@
-import { html, Html } from "@elysiajs/html";
+/** biome-ignore-all lint/correctness/noUnusedImports: Elisia necesita importar HTML aunque no lo use */
+import { Html, html } from "@elysiajs/html";
 import { Elysia } from "elysia";
-import Saludos from "./saludos.html" with { type: "text" };;
+import GamesPage from "public/Frontend/games.html" with { type: "text" };
+import index from "public/index.html" with { type: "text" };
 
 export const plugin = <T extends string>(config: { prefix: T }) =>
 	new Elysia({
@@ -32,4 +34,5 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				</body>
 			</html>
 		))
-		.get("/Saludos", () => Saludos)
+		.get("/", () => index)
+		.get("/games", () => GamesPage);

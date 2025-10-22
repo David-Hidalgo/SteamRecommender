@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Juegos - SteamRecommender</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Juegos guardados</h1>
+		</header>
+
+		<section>
+			<div id="status">Cargando...</div>
+			<table id="games-table" class="table" style="width:100%; display:none">
+				<thead>
+					<tr>
+						<th>AppID</th>
+						<th>Nombre</th>
+						<th>Tipo</th>
+					</tr>
+				</thead>
+				<tbody id="games-body"></tbody>
+			</table>
+		</section>
+	</div>
+
+		<!-- Cargar el script como módulo ES compilado desde /public/scripts -->
+		<script type="module" src="games.ts"></script>
+</body>
+</html>

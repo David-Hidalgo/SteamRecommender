@@ -1,11 +1,14 @@
 import { file, inspect } from "bun";
-import { Game as GameModel } from "../models/games.model";
 import { client } from "../index";
+import { Game as GameModel } from "../models/games.model";
 
 // Tipos mínimos para la API de Steam
 type SteamApp = { appid: number; name: string };
 type AppDetailsData = { type?: string } & Record<string, unknown>;
-type AppDetailsResponse = Record<string, { success: boolean; data?: AppDetailsData }>;
+type AppDetailsResponse = Record<
+	string,
+	{ success: boolean; data?: AppDetailsData }
+>;
 
 // --- CONFIGURACIÓN ---
 const STEAM_API_URL = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
@@ -50,7 +53,9 @@ async function importarJuegosDeSteam() {
 			if (!respuesta.ok) {
 				throw new Error(`HTTP ${respuesta.status} - ${respuesta.statusText}`);
 			}
-			const data = (await respuesta.json()) as { applist: { apps: SteamApp[] } };
+			const data = (await respuesta.json()) as {
+				applist: { apps: SteamApp[] };
+			};
 			console.log(data);
 
 			aplicaciones = new Set(data.applist.apps);
@@ -104,9 +109,7 @@ async function importarJuegosDeSteam() {
 			await nuevoJuego.save();
 			console.log(`✅ Juego guardado en la base de datos: ${app.name}`);
 			aplicaciones.delete(app);
-			file("./steam_apps.json").write(
-				JSON.stringify(Array.from(aplicaciones)),
-			);
+			file("./steam_apps.json").write(JSON.stringify(Array.from(aplicaciones)));
 		}
 	} catch (error: unknown) {
 		if (error instanceof Error) {
