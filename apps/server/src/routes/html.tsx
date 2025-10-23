@@ -3,6 +3,7 @@ import { Html, html } from "@elysiajs/html";
 import { Elysia } from "elysia";
 import GamesPage from "public/Frontend/games.html" with { type: "text" };
 import index from "public/index.html" with { type: "text" };
+import Footer from "../components/footer.js";
 
 export const plugin = <T extends string>(config: { prefix: T }) =>
 	new Elysia({
@@ -31,6 +32,7 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				</head>
 				<body>
 					<h1>Hello World TSX</h1>
+					<Footer />
 				</body>
 			</html>
 		))
