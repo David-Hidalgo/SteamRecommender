@@ -13,6 +13,7 @@
 		"@SteamRecommender/auth": "workspace:*",
 		"@SteamRecommender/db": "workspace:*",
 		"@elysiajs/cors": "^1.3.3",
+		"@elysiajs/cron": "^1.4.1",
 		"@elysiajs/html": "^1.4.0",
 		"@elysiajs/openapi": "^1.4.11",
 		"@elysiajs/static": "^1.4.4",

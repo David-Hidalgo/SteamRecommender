@@ -11,6 +11,24 @@ const userSchema = new Schema(
 		image: { type: String },
 		createdAt: { type: Date, required: true },
 		updatedAt: { type: Date, required: true },
+		gamePreferences: [
+			{
+				gameId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "game",
+					required: true,
+				}, // Referencia al modelo Game
+				rating: { type: Number, min: 1, max: 5, required: true }, // Calificación de 1 a 5 (puedes cambiar esto por otro objeto)
+				// Puedes agregar más campos aquí, como un objeto con notas o preferencias adicionales
+				notes: { type: String, default: "" }, // Ejemplo de otro objeto: notas del usuario sobre el juego
+			},
+		],
+		wishlist: [
+			{
+				gameId: { type: mongoose.Schema.Types.ObjectId, ref: "game", required: true },
+				addedAt: { type: Date, default: Date.now },
+			},
+		],
 	},
 	{ collection: "user" },
 );

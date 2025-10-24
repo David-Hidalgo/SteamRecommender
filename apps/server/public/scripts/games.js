@@ -7,7 +7,7 @@ async function loadGames() {
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const data = await res.json();
 		// Guardar los juegos en localStorage
-		localStorage.setItem('games', JSON.stringify(data));
+		localStorage.setItem("games", JSON.stringify(data));
 		if (!Array.isArray(data) || data.length === 0) {
 			if (status) status.textContent = "No hay juegos guardados.";
 			return;
@@ -26,7 +26,6 @@ async function loadGames() {
 			tr.appendChild(nameTd);
 			tr.appendChild(typeTd);
 			if (body) body.appendChild(tr);
-
 		}
 	} catch (err) {
 		if (status) status.textContent = `Error al cargar juegos: ${String(err)}`;

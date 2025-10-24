@@ -15,4 +15,10 @@ export const auth = betterAuth({
 			httpOnly: true,
 		},
 	},
+	user: {
+		additionalFields: {
+			gamePreferences: { type: "json", required: true },
+			wishlist: { type: "json" },
+		},
+	},
 });

@@ -20,7 +20,7 @@ const connectDatabases = async () => {
 void connectDatabases();
 
 // Usa el nombre de BD del env si se define, si no, por defecto 'myDB'
-const dbName = process.env.DB_NAME || "myDB";
+const dbName = process.env.DB_NAME || "SteamRecommender";
 const client = mongoose.connection.getClient().db(dbName);
 
 export { client };

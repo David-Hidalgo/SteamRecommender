@@ -1,9 +1,10 @@
 import "dotenv/config";
 import { auth } from "@SteamRecommender/auth";
 import { cors } from "@elysiajs/cors";
+import { cron, Patterns } from "@elysiajs/cron";
+import { Html, html } from "@elysiajs/html";
 import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
-import { html, Html } from "@elysiajs/html";
 import { Elysia } from "elysia";
 import index from "./../public/index.html" with { type: "text" };
 import { plugin as gamesPlugin } from "./routes/games";
@@ -43,8 +44,17 @@ const _app = new Elysia()
 		}),
 	)
 	.use(html())
+	.use(
+		cron({
+			name: "heartbeat",
+			pattern: Patterns.everyHours(),
+			run() {
+				console.log("Heartbeat");
+			},
+		}),
+	)
 	.use(gamesPlugin({ prefix: "/api" }))
-	.onError(async ({ code, request, set }) => {
+	.onError(async ({ code, request }) => {
 		console.log("Error");
 		if (code === "NOT_FOUND" && request.method === "GET") {
 			const notFoundPage = await loadNotFoundPage();

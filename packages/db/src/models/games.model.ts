@@ -11,3 +11,6 @@ const gameSchema = new Schema(
 	{ collection: "game" },
 );
 export const Game = model("Game", gameSchema);
+
+type GameType = mongoose.InferSchemaType<typeof gameSchema>;
+export type { GameType };
