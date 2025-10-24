@@ -17,7 +17,7 @@ const STEAM_API_URL = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
 /**
  * Función principal que orquesta todo el proceso de importación.
  */
-async function importarJuegosDeSteam() {
+export const importarJuegosDeSteam = async () => {
 	console.log("🚀 Iniciando la importación de juegos de Steam...");
 
 	try {
@@ -74,7 +74,7 @@ async function importarJuegosDeSteam() {
 		);
 
 		//agarro unos juegos al azar para probar
-		const cuantos = 100;
+		const cuantos = 50;
 		console.log(
 			`2. Filtrando y preparando ${cuantos} juegos para insertar en la base de datos...`,
 		);
@@ -97,6 +97,7 @@ async function importarJuegosDeSteam() {
 			console.log(inspect(data, { depth: 1, colors: true }));
 			if (!data?.type || data.type !== "game") {
 				console.log(`❌ El juego ${app.name} no es un juego válido.`);
+				aplicaciones.delete(app);
 				continue;
 			}
 			// Aquí podrías transformar y guardar los detalles del juego en la base de datos
@@ -118,9 +119,4 @@ async function importarJuegosDeSteam() {
 			console.error("❌ Ocurrió un error durante el proceso:", error);
 		}
 	}
-}
-
-// Ejecutamos la función principal
-await importarJuegosDeSteam();
-
-console.log("Colección 'Juegos' creada con éxito.");
+};

@@ -47,12 +47,10 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				"/user/preference",
 				async ({ body: { userId, gameId, rating, notes }, status }) => {
 					const user = await User.findById(userId);
-					if (!user)
-						return status(404, { message: "Usuario no encontrado" });
+					if (!user) return status(404, { message: "Usuario no encontrado" });
 
 					const game = await GameModel.findOne({ appid: gameId });
-					if (!game)
-						return status(404, { message: "Juego no encontrado" });
+					if (!game) return status(404, { message: "Juego no encontrado" });
 
 					user.gamePreferences.push({
 						gameId: game._id,
@@ -80,15 +78,13 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				"/user/wishlist",
 				async ({ body: { userId, gameId }, status }) => {
 					const user = await User.findById(userId);
-					if (!user)
-						return status(404, { message: "Usuario no encontrado" });
+					if (!user) return status(404, { message: "Usuario no encontrado" });
 
 					const game = await GameModel.findOne({ appid: gameId });
-					if (!game)
-						return status(404, { message: "Juego no encontrado" });
+					if (!game) return status(404, { message: "Juego no encontrado" });
 
-					const alreadyInWishlist = user.wishlist.some(({ gameId: storedGameId }) =>
-						storedGameId?.equals?.(game._id),
+					const alreadyInWishlist = user.wishlist.some(
+						({ gameId: storedGameId }) => storedGameId?.equals?.(game._id),
 					);
 					if (alreadyInWishlist)
 						return status(200, { message: "El juego ya está en la wishlist" });

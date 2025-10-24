@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { auth } from "@SteamRecommender/auth";
+import { importarJuegosDeSteam } from "@SteamRecommender/db/scripts/mongooseImport";
 import { cors } from "@elysiajs/cors";
 import { cron, Patterns } from "@elysiajs/cron";
 import { Html, html } from "@elysiajs/html";
@@ -46,15 +47,16 @@ const _app = new Elysia()
 	.use(html())
 	.use(
 		cron({
-			name: "heartbeat",
-			pattern: Patterns.everyHours(),
+			name: "popularDB",
+			pattern: Patterns.everyMinute(),
 			run() {
-				console.log("Heartbeat");
+				console.log("popularDB");
+				importarJuegosDeSteam();
 			},
 		}),
 	)
 	.use(gamesPlugin({ prefix: "/api" }))
-	.onError(async ({ code, request,error }) => {
+	.onError(async ({ code, request, error }) => {
 		console.log(error);
 		if (code === "NOT_FOUND" && request.method === "GET") {
 			const notFoundPage = await loadNotFoundPage();

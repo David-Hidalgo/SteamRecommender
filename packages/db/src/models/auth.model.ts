@@ -25,7 +25,11 @@ const userSchema = new Schema(
 		],
 		wishlist: [
 			{
-				gameId: { type: mongoose.Schema.Types.ObjectId, ref: "game", required: true },
+				gameId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "game",
+					required: true,
+				},
 				addedAt: { type: Date, default: Date.now },
 			},
 		],

@@ -1,6 +1,9 @@
 // Adaptado de footer.tsx para usar JSX en ElysiaJS con @elysiajs/html.
 // Importa Html para JSX (asegúrate de tener tsconfig.json configurado con jsx: "react", jsxFactory: "Html.createElement").
-import { authClient, getErrorMessage } from "@SteamRecommender/auth/lib/auth-client";
+import {
+	authClient,
+	getErrorMessage,
+} from "@SteamRecommender/auth/lib/auth-client";
 // biome-ignore lint/correctness/noUnusedImports: HTML de ellysia siempre requerido
 import { Html } from "@elysiajs/html";
 
@@ -26,7 +29,9 @@ const handleSubmit = async (event: SubmitEvent) => {
 
 if (typeof document !== "undefined") {
 	document.addEventListener("DOMContentLoaded", () => {
-		const form = document.getElementById("login-form") as HTMLFormElement | null;
+		const form = document.getElementById(
+			"login-form",
+		) as HTMLFormElement | null;
 		if (!form) return;
 		form.addEventListener("submit", handleSubmit);
 	});

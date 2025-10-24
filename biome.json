@@ -25,7 +25,8 @@
 			"!**/.svelte-kit",
 			"!**/wrangler.jsonc",
 			"!**/.source"
-		]
+		],
+		"maxSize": 100048576
 	},
 	"formatter": {
 		"enabled": true,
