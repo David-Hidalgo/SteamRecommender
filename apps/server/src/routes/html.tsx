@@ -2,6 +2,7 @@
 import { Html, html } from "@elysiajs/html";
 import { Elysia } from "elysia";
 import Footer from "@/components/footer";
+import { IniciarSesion } from "@/components/iniciarSesion";
 
 export const plugin = <T extends string>(config: { prefix: T }) =>
 	new Elysia({
@@ -33,6 +34,17 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				<body>
 					<h1>Hello World TSX</h1>
 					<Footer />
+				</body>
+			</html>
+		))
+		.get("/signin", () => (
+			<html lang="es">
+				<head>
+					<title>Iniciar Sesión</title>
+				</head>
+				<body>
+					<h1>Iniciar Sesión</h1>
+					<IniciarSesion />
 				</body>
 			</html>
 		));

@@ -54,8 +54,8 @@ const _app = new Elysia()
 		}),
 	)
 	.use(gamesPlugin({ prefix: "/api" }))
-	.onError(async ({ code, request }) => {
-		console.log("Error");
+	.onError(async ({ code, request,error }) => {
+		console.log(error);
 		if (code === "NOT_FOUND" && request.method === "GET") {
 			const notFoundPage = await loadNotFoundPage();
 			return new Response(notFoundPage, {
