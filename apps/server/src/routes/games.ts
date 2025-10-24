@@ -7,13 +7,15 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 		name: "Games",
 		seed: config,
 		prefix: config.prefix,
-	})
-		.get("/", () => "Games endpoint")
-		.get("/list", async () => {
-			try {
-				return await GameModel.find();
-			} catch (err) {
-				console.error("Error reading games from DB:", err);
-				return [];
-			}
-		});
+	}).group("/games", (app) =>
+		app
+			.get("/", () => "Games endpoint")
+			.get("/list", async () => {
+				try {
+					return await GameModel.find().limit(50).exec();
+				} catch (err) {
+					console.error("Error reading games from DB:", err);
+					return [];
+				}
+			}),
+	);

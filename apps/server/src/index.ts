@@ -3,7 +3,9 @@ import { auth } from "@SteamRecommender/auth";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
+import { html, Html } from "@elysiajs/html";
 import { Elysia } from "elysia";
+import index from "./../public/index.html" with { type: "text" };
 import { plugin as gamesPlugin } from "./routes/games";
 import { plugin as htmlPlugin } from "./routes/html";
 
@@ -40,28 +42,32 @@ const _app = new Elysia()
 			credentials: true,
 		}),
 	)
+	.use(html())
+	.use(gamesPlugin({ prefix: "/api" }))
+	.onError(async ({ code, request, set }) => {
+		console.log("Error");
+		if (code === "NOT_FOUND" && request.method === "GET") {
+			const notFoundPage = await loadNotFoundPage();
+			return new Response(notFoundPage, {
+				status: 404,
+				headers: {
+					"content-type": "text/html; charset=utf-8",
+				},
+			});
+		}
+	})
 	.use(openapi())
 	.use(staticPlugin())
 	.use(htmlPlugin({ prefix: "/html" }))
-	.use(gamesPlugin({ prefix: "/games" }))
-	.mount(auth.handler)
-	// .all("/api/auth/*", async (context) => {
-	// 	const { request, status } = context;
-	// 	if (["POST", "GET"].includes(request.method)) {
-	// 		return auth.handler(request);
-	// 	}
-	// 	return status(405);
-	// })
-
-	.get("/", () => "OK")
-	.onError(async ({ code, request, set }) => {
-		if (code === "NOT_FOUND" && request.method === "GET") {
-			set.status = 404;
-			set.headers ??= {};
-			set.headers["content-type"] = "text/html; charset=utf-8";
-			return await loadNotFoundPage();
+	.all("/api/auth/*", async (context) => {
+		const { request, status } = context;
+		if (["POST", "GET"].includes(request.method)) {
+			return auth.handler(request);
 		}
+		return status(405);
 	})
+
+	.get("/", () => index)
 	.listen(3000, () => {
 		console.log("Server is running on http://localhost:3000");
 	});

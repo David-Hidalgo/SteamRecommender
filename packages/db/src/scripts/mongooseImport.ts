@@ -74,7 +74,7 @@ async function importarJuegosDeSteam() {
 		);
 
 		//agarro unos juegos al azar para probar
-		const cuantos = 150;
+		const cuantos = 100;
 		console.log(
 			`2. Filtrando y preparando ${cuantos} juegos para insertar en la base de datos...`,
 		);
@@ -94,7 +94,7 @@ async function importarJuegosDeSteam() {
 			}
 			const detallesData = (await respuesta.json()) as AppDetailsResponse;
 			const data = detallesData[String(app.appid)]?.data;
-			console.log(inspect(detallesData, { depth: 1, colors: true }));
+			console.log(inspect(data, { depth: 1, colors: true }));
 			if (!data?.type || data.type !== "game") {
 				console.log(`❌ El juego ${app.name} no es un juego válido.`);
 				continue;
@@ -121,6 +121,6 @@ async function importarJuegosDeSteam() {
 }
 
 // Ejecutamos la función principal
-importarJuegosDeSteam();
+await importarJuegosDeSteam();
 
 console.log("Colección 'Juegos' creada con éxito.");
