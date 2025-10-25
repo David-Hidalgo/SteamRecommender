@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard de Juegos - SteamRecommender</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+		<style>
+			body {
+				background-color: #f0f2f5;
+			}
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+			header {
+				text-align: center;
+				margin-bottom: 40px;
+			}
+			#games-container {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				gap: 20px;
+			}
+			#status {
+				text-align: center;
+				font-size: 1.2em;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Dashboard de Juegos</h1>
+				<p>Juegos recomendados y guardados</p>
+			</header>
+
+			<main>
+				<div id="status">Cargando juegos...</div>
+				<div id="games-container"></div>
+			</main>
+		</div>
+
+		<script type="module" src="/public/scripts/game-card-wc.js"></script>
+		<script type="module" src="/public/scripts/dashboard.js"></script>
+	</body>
+</html>

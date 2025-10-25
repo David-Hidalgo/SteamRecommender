@@ -35,7 +35,7 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 			.get("/list", async () => {
 				try {
 					return await GameModel.find()
-						.select("_id data.type data.categories data.capsule_image")
+						.select("appid name")
 						.limit(50)
 						.exec();
 				} catch (err) {
