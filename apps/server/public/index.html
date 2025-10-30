@@ -1,19 +1,46 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset='utf-8'>
-	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
-	<title>SteamRecommender</title>
-	<meta name='viewport' content='width=device-width, initial-scale=1'>
-	<!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css"/>
-	<script type="module" src='/public/scripts/footer-wc.js'></script>
-</head>
-<body>
-	<h1>
-		SteamRecommender
-	</h1>
-	<a href="/public/Frontend/games.html">Juegos</a>
-	<footer-wc></footer-wc>
-</body>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard - SteamRecommender</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+		<link rel="stylesheet" href="/components/dashboard/dashboard.css" />
+	</head>
+	<body>
+		<div class="sidebar">
+			<div class="user-info">
+				<img src="https://via.placeholder.com/80" alt="User Avatar" />
+				<h2>Nombre de Usuario</h2>
+				<p>En línea</p>
+			</div>
+			<nav>
+				<a href="#" data-view="lista-juegos" class="active">Lista de Juegos</a>
+				<a href="#" data-view="games">Juegos Guardados</a>
+				<a href="#">Tienda</a>
+				<a href="#">Comunidad</a>
+				<a href="#">Perfil</a>
+			</nav>
+			<div class="friends-menu">
+				<h3>Amigos</h3>
+				<ul>
+					<li><img src="https://via.placeholder.com/30" alt="Friend Avatar" /> Amigo 1</li>
+					<li><img src="https://via.placeholder.com/30" alt="Friend Avatar" /> Amigo 2</li>
+					<li><img src="https://via.placeholder.com/30" alt="Friend Avatar" /> Amigo 3</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="main-content">
+			<header>
+				<h1>SteamRecommender</h1>
+			</header>
+			<main id="content-container">
+				<!-- El contenido de las vistas se cargará aquí -->
+			</main>
+		</div>
+
+		<script src="/components/dashboard/dashboard.js"></script>
+        <script type="module" src="/shared/footer-wc.js"></script>
+	</body>
 </html>

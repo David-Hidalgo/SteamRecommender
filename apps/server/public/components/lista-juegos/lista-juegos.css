@@ -1,0 +1,10 @@
+/* Estilos para la vista de lista de juegos */
+#games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+#status {
+    text-align: center;
+    font-size: 1.2em;
+}

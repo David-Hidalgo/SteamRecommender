@@ -1,0 +1,55 @@
+<main>
+    <h1>Lista de Juegos</h1>
+    <p>Juegos recomendados y guardados</p>
+    <div id="status">Cargando juegos...</div>
+    <div id="games-container"></div>
+</main>
+
+<!-- Los scripts y estilos se cargan dinámicamente desde el dashboard.js -->
+<script type="module" src="/public/shared/game-card-wc.js"></script>
+<script type="module">
+    async function loadGames() {
+        const status = document.getElementById("status");
+        const container = document.getElementById("games-container");
+
+        // Prevenir carga duplicada si el contenedor ya tiene juegos
+        if (container.children.length > 1) { // >1 para ignorar el posible nodo de "status"
+            status.style.display = "none";
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/games/list");
+            if (!res.ok) {
+                throw new Error(`Error HTTP ${res.status}`);
+            }
+            const games = await res.json();
+
+            if (!Array.isArray(games) || games.length === 0) {
+                status.textContent = "No se encontraron juegos.";
+                return;
+            }
+
+            status.style.display = "none";
+
+            for (const game of games) {
+                const gameCard = document.createElement("game-card");
+                const appId = game.appid ?? game.steam_appid ?? game._id;
+                const name = game.name ?? game.data?.name;
+
+                if (appId && name) {
+                    gameCard.setAttribute("appid", appId);
+                    gameCard.setAttribute("name", name);
+                    container.appendChild(gameCard);
+                }
+            }
+        } catch (error) {
+            status.textContent = `Error al cargar los juegos: ${error.message}`;
+            console.error(error);
+        }
+    }
+
+    // Cargar los juegos cuando el script se inserte en el DOM
+    loadGames();
+</script>
+
