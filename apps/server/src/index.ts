@@ -36,14 +36,14 @@ const loadNotFoundPage = async (): Promise<string> => {
 };
 
 const _app = new Elysia()
-	.use(
+/* 	.use(
 		cors({
 			origin: process.env.CORS_ORIGIN || "",
 			methods: ["GET", "POST", "OPTIONS"],
 			allowedHeaders: ["Content-Type", "Authorization"],
 			credentials: true,
 		}),
-	)
+	) */
 	.use(html())
 	.use(
 		cron({
