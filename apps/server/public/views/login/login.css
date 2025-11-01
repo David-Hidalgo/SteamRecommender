@@ -1,0 +1,8 @@
+#app-root{ min-height: calc(100vh - 70px); display:flex; align-items:center; justify-content:center }
+body{ background:var(--bg,#0b0b0d); color:var(--text,#eaeaf0) }
+.container{ padding:18px; background:var(--surface,#0f1115); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.6) }
+#login-form label{ display:block }
+#login-form input{ width:100%; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:var(--text) }
+#submit{ padding:8px 12px; border-radius:8px }
+#login-form .small-muted{ color:var(--muted,#9aa0a6); margin-top:8px }
+h1{ color: #ffd54f; margin:0 0 6px 0 }

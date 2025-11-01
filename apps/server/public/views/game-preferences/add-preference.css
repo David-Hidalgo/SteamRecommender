@@ -1,0 +1,11 @@
+/* reuse styles from previous add-preference layout */
+#main-area { display:flex; gap:12px; align-items:flex-start }
+#results { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px }
+#selection-panel img { max-width:100%; border-radius:8px }
+.selected-row { display:flex; gap:8px; align-items:center }
+.actions { display:flex; gap:8px; margin-top:8px }
+
+@media (max-width:800px){
+  #main-area { flex-direction:column }
+  #selection-panel { min-width: auto }
+}

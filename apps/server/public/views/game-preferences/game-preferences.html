@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Game Preferences - SteamRecommender</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+  <link rel="stylesheet" href="/public/views/shared/dark.css" />
+  <script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+  <script type="module" src="/public/scripts/game-card-wc.js"></script>
+  <link rel="stylesheet" href="/public/views/game-preferences/game-preferences.css" />
+</head>
+<body>
+  <navbar-wc></navbar-wc>
+  <div class="container" style="max-width:900px; margin-top:24px;">
+    <h1>Añadir juego a preferencias</h1>
+    <p>Busca un juego y presiona "Agregar" para añadirlo a tus game preferences.</p>
+
+    <div style="margin-top:12px; display:flex; gap:8px; align-items:center">
+      <input id="q" type="search" placeholder="Buscar juego por nombre..." style="flex:1; padding:8px; border-radius:8px" />
+      <button id="searchBtn" type="button" style="padding:8px 12px; border-radius:8px;">Buscar</button>
+    </div>
+
+    <div id="main-area" style="margin-top:16px; display:flex; gap:12px; align-items:flex-start;">
+      <div id="results" style="flex:2; display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px"></div>
+      <!-- selection panel shown when user clicks a card -->
+      <div id="selection-panel" style="flex:1; min-width:280px;"></div>
+    </div>
+    <div id="status" style="margin-top:12px"></div>
+  </div>
+
+  <script type="module" src="/public/views/game-preferences/add-preference.js"></script>
+</body>
+</html>

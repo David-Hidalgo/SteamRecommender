@@ -1,0 +1,38 @@
+:root {
+  /* Palette for dark mode */
+  --bg: #0b0b10;
+  --surface: #0f1115;
+  --muted: #c6c6cf;
+  --text: #e8e8ee;
+  --accent: #9b59b6; /* purple */
+  --accent-600: #7b3aa8;
+  --nav-bg: linear-gradient(180deg, #0f1115, #111217);
+  --footer-bg: transparent;
+  --table-border: rgba(255,255,255,0.06);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* generic surface */
+.surface {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* tables */
+table.table {
+  border-collapse: collapse;
+}
+table.table thead th {
+  border-bottom: 1px solid var(--table-border);
+  color: var(--muted);
+}
+table.table td {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+/* ensure link contrast */
+a { color: var(--text); }

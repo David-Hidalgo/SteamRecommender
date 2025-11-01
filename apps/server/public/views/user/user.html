@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Perfil - SteamRecommender</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+  <link rel="stylesheet" href="/public/views/shared/dark.css" />
+  <script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+  <link rel="stylesheet" href="/public/views/user/user.css" />
+</head>
+<body>
+  <navbar-wc></navbar-wc>
+  <div class="container">
+    <header>
+      <h1>Mi Perfil</h1>
+      <p class="subtitle">Consulta tu perfil y accede a tus preferencias de juego</p>
+    </header>
+
+    <section id="status" style="margin-top:12px"></section>
+
+    <section id="profile" class="card" style="display:none; margin-top:16px; padding:16px;">
+      <h2 id="profile-name"></h2>
+      <div id="profile-email"></div>
+      <div id="profile-meta"></div>
+
+    </section>
+
+    <section id="preferences" style="display:none; margin-top:16px;">
+      <h3>Tus preferencias</h3>
+      <div id="prefs-list" class="cards"></div>
+    </section>
+  </div>
+
+  <script type="module" src="/public/views/user/user.js"></script>
+</body>
+</html>

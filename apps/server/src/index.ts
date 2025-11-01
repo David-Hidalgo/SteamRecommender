@@ -9,6 +9,7 @@ import { staticPlugin } from "@elysiajs/static";
 import { Elysia } from "elysia";
 import index from "./../public/index.html" with { type: "text" };
 import { plugin as gamesPlugin } from "./routes/games";
+import { plugin as usersPlugin } from "./routes/users";
 import { plugin as htmlPlugin } from "./routes/html";
 
 const NOT_FOUND_PAGE_URL =
@@ -56,6 +57,7 @@ const _app = new Elysia()
 		}),
 	) */
 	.use(gamesPlugin({ prefix: "/api" }))
+	.use(usersPlugin({ prefix: "/api" }))
 	.onError(async ({ code, request, error }) => {
 		console.log(error);
 		if (code === "NOT_FOUND" && request.method === "GET") {
