@@ -1,14 +1,15 @@
 import { User } from "@SteamRecommender/db/models/auth.model";
 import { Game as GameModel } from "@SteamRecommender/db/models/games.model";
-import { Elysia, t } from "elysia";
 import {
-	recommendSimilarGamesByContent,
+	recommendByGameContext,
 	recommendForUserCollaborative,
 	recommendGamesByPublisher,
-	recommendByGameContext,
+	recommendSimilarGamesByContent,
 } from "@SteamRecommender/db/recommender";
+import { Elysia, t } from "elysia";
 // Intentamos usar el cliente nativo exportado por el paquete db
 
+// Games plugin: routes that do not require user context
 export const plugin = <T extends string>(config: { prefix: T }) =>
 	new Elysia({
 		name: "Games",
@@ -31,86 +32,84 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					}
 				},
 				{
-					params: t.Object({
-						id: t.Number(),
-					}),
-					query: t.Object({
-						name: t.String(),
-					}),
+					params: t.Object({ id: t.Number() }),
+					query: t.Object({ name: t.String() }),
+				},
+			)
+			.get(
+				"/top10",
+				async () => {
+					try {
+						// If there are user ratings, we could aggregate; for now return random sample with consistent shape
+						const sample = await GameModel.aggregate([
+							{ $sample: { size: 10 } },
+							{
+								$project: { appid: 1, name: 1, capsule: "$data.capsule_image" },
+							},
+						]);
+
+						return sample.map((g: any) => ({
+							appid: g.appid,
+							name: g.name,
+							avgRating: 0,
+							count: 0,
+							capsule: g.capsule ?? "",
+						}));
+					} catch (err) {
+						console.error("Error computing top10:", err);
+						return [];
+					}
+				},
+				{
+					response: {
+						200: t.Array(
+							t.Object({
+								appid: t.Number(),
+								name: t.String(),
+								avgRating: t.Number(),
+								count: t.Number(),
+								capsule: t.String(),
+							}),
+						),
+					},
 				},
 			)
 			.get("/list", async () => {
 				try {
+					// return a lightweight projection that includes name and appid for client-side search
 					return await GameModel.find()
-						.select("_id data.type data.categories data.capsule_image")
-						.limit(50)
+						.select("_id appid name data.capsule_image")
+						.limit(200)
+						.lean()
 						.exec();
 				} catch (err) {
 					console.error("Error reading games from DB:", err);
 					return [];
 				}
 			})
-			.post(
-				"/user/preference",
-				async ({ body: { userId, gameId, rating, notes }, status }) => {
-					const user = await User.findById(userId);
-					if (!user) return status(404, { message: "Usuario no encontrado" });
-
-					const game = await GameModel.findOne({ appid: gameId });
-					if (!game) return status(404, { message: "Juego no encontrado" });
-
-					user.gamePreferences.push({
-						gameId: game._id,
-						rating,
-						notes: notes ?? "",
-					});
-					await user.save();
-
-					return status(201, { message: "Preferencia agregada" });
+			.get(
+				"/search",
+				async ({ query }) => {
+					const q = (query as any)?.q;
+					if (!q || String(q).trim().length === 0) return [];
+					const term = String(q).trim();
+					try {
+						const regex = new RegExp(
+							term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+							"i",
+						);
+						return await GameModel.find({ name: { $regex: regex } })
+							.select("_id appid name data.capsule_image")
+							.limit(120)
+							.lean()
+							.exec();
+					} catch (err) {
+						console.error("Error searching games:", err);
+						return [];
+					}
 				},
 				{
-					body: t.Object({
-						userId: t.String(),
-						gameId: t.Numeric(),
-						rating: t.Number({ minimum: 1, maximum: 5 }),
-						notes: t.Optional(t.String()),
-					}),
-					response: {
-						201: t.Object({ message: t.String() }),
-						404: t.Object({ message: t.String() }),
-					},
-				},
-			)
-			.post(
-				"/user/wishlist",
-				async ({ body: { userId, gameId }, status }) => {
-					const user = await User.findById(userId);
-					if (!user) return status(404, { message: "Usuario no encontrado" });
-
-					const game = await GameModel.findOne({ appid: gameId });
-					if (!game) return status(404, { message: "Juego no encontrado" });
-
-					const alreadyInWishlist = user.wishlist.some(
-						({ gameId: storedGameId }) => storedGameId?.equals?.(game._id),
-					);
-					if (alreadyInWishlist)
-						return status(200, { message: "El juego ya está en la wishlist" });
-
-					user.wishlist.push({ gameId: game._id });
-					await user.save();
-
-					return status(201, { message: "Juego agregado a la wishlist" });
-				},
-				{
-					body: t.Object({
-						userId: t.String(),
-						gameId: t.Numeric(),
-					}),
-					response: {
-						200: t.Object({ message: t.String() }),
-						201: t.Object({ message: t.String() }),
-						404: t.Object({ message: t.String() }),
-					},
+					query: t.Object({ q: t.String() }),
 				},
 			)
 			.get(
@@ -119,13 +118,26 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					const { appid } = ctx.params || {};
 					const { status } = ctx;
 					try {
-						console.info("Running recommendSimilarGamesByContent for appid:", appid);
-						const recs = await recommendSimilarGamesByContent(Number(appid), 20);
+						console.info(
+							"Running recommendSimilarGamesByContent for appid:",
+							appid,
+						);
+						const recs = await recommendSimilarGamesByContent(
+							Number(appid),
+							20,
+						);
 						return recs;
 					} catch (err: any) {
-						console.error("Error running recommendSimilarGamesByContent:", err?.message || err, err?.stack);
+						console.error(
+							"Error running recommendSimilarGamesByContent:",
+							err?.message || err,
+							err?.stack,
+						);
 						// Dev-only: return error message/stack to help debugging
-						return status(500, { message: err?.message ?? "Internal Server Error", stack: err?.stack });
+						return status(500, {
+							message: err?.message ?? "Internal Server Error",
+							stack: err?.stack,
+						});
 					}
 				},
 				{
@@ -171,9 +183,13 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				async (ctx: any) => {
 					const { userId, limit } = ctx.query || {};
 					const { status } = ctx;
-					if (!userId) return status(400, { message: "userId query param is required" });
+					if (!userId)
+						return status(400, { message: "userId query param is required" });
 					try {
-						const recs = await recommendForUserCollaborative(String(userId), Number(limit) || 20);
+						const recs = await recommendForUserCollaborative(
+							String(userId),
+							Number(limit) || 20,
+						);
 						return recs;
 					} catch (err) {
 						console.error("Error running recommendForUserCollaborative:", err);
@@ -181,7 +197,10 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					}
 				},
 				{
-					query: t.Object({ userId: t.String(), limit: t.Optional(t.Number()) }),
+					query: t.Object({
+						userId: t.String(),
+						limit: t.Optional(t.Number()),
+					}),
 				},
 			),
 	);

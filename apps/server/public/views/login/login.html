@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Iniciar sesión - SteamRecommender</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+  <link rel="stylesheet" href="/public/views/shared/dark.css" />
+  <script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+  <link rel="stylesheet" href="/public/views/login/login.css" />
+</head>
+<body>
+  <navbar-wc></navbar-wc>
+  <div id="app-root">
+    <div class="container" style="max-width:520px; margin:28px;">
+    <h1>Iniciar sesión</h1>
+    <p>Introduce tu correo y contraseña para iniciar sesión.</p>
+    <form id="login-form" style="margin-top:12px; display:grid; gap:8px;">
+      <label>Email:
+        <input id="email" type="email" name="email" required />
+      </label>
+      <label>Contraseña:
+        <input id="password" type="password" name="password" required />
+      </label>
+      <div>
+        <button id="submit" type="submit">Entrar</button>
+        <a href="/public/index.html" style="margin-left:8px">Volver</a>
+      </div>
+      <div id="error" class="small-muted"></div>
+    </form>
+    </div>
+  </div>
+
+  <script type="module" src="/public/views/login/login.js"></script>
+</body>
+</html>

@@ -7,13 +7,23 @@
 	<meta name='viewport' content='width=device-width, initial-scale=1'>
 	<!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css"/>
-	<script type="module" src='/public/scripts/footer-wc.js'></script>
+	<script type="module" src="/public/scripts/footer-wc.js"></script>
+	<link rel="stylesheet" href="/public/views/shared/dark.css" />
+	<script src="/public/scripts/dark-mode.js"></script>
+	<script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+	<link rel="stylesheet" href="/public/views/index/index.css" />
 </head>
 <body>
-	<h1>
-		SteamRecommender
-	</h1>
-	<a href="/public/Frontend/games.html">Juegos</a>
-	<footer-wc></footer-wc>
+	<navbar-wc></navbar-wc>
+	<main style="padding:1rem 1.25rem;">
+		<div style="max-width:1100px;margin:0 auto">
+			<h1 class="page-title" style="margin:18px 0 6px 0;text-align:center">Top juegos</h1>
+			<p class="subtitle" style="text-align:center;color:var(--muted,#9a9aa6);margin:0 0 18px 0">Lo mejor según la colección</p>
+			<section id="top-games-section">
+				<div id="top-games" class="cards-grid"></div>
+			</section>
+		</div>
+	</main>
+	<script type="module" src="/public/views/index/index.js"></script>
 </body>
 </html>

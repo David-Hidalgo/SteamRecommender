@@ -15,7 +15,7 @@ const userSchema = new Schema(
 			{
 				gameId: {
 					type: mongoose.Schema.Types.ObjectId,
-					ref: "game",
+					ref: "Game",
 					required: true,
 				}, // Referencia al modelo Game
 				rating: { type: Number, min: 1, max: 5, required: true }, // Calificación de 1 a 5 (puedes cambiar esto por otro objeto)
@@ -27,7 +27,7 @@ const userSchema = new Schema(
 			{
 				gameId: {
 					type: mongoose.Schema.Types.ObjectId,
-					ref: "game",
+					ref: "Game",
 					required: true,
 				},
 				addedAt: { type: Date, default: Date.now },

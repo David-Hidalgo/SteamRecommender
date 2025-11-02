@@ -12,14 +12,14 @@ class FooterWC extends HTMLElement {
 					footer {
 						padding: 1rem;
 						text-align: center;
-						border-top: 1px solid #eaeaea;
+						border-top: 1px solid var(--table-border, rgba(255,255,255,0.06));
 						margin-top: 2rem;
-						color: #666;
+						color: var(--muted, #c6c6cf);
 						font-size: 0.9rem;
-						background: transparent;
+						background: var(--footer-bg, transparent);
 					}
 					a {
-						color: inherit;
+						color: var(--text, #e8e8ee);
 						text-decoration: none;
 						margin: 0 0.5rem;
 					}
