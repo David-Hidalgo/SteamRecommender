@@ -1,5 +1,15 @@
 /* estilos mínimos para la vista de juegos */
-body{ padding: 1rem; }
-.container{ max-width: 980px; margin: 0 auto; }
-#status{ margin: 1rem 0; }
-#games-table td, #games-table th{ padding: .5rem; }
+body {
+	padding: 1rem;
+}
+.container {
+	max-width: 980px;
+	margin: 0 auto;
+}
+#status {
+	margin: 1rem 0;
+}
+#games-table td,
+#games-table th {
+	padding: 0.5rem;
+}

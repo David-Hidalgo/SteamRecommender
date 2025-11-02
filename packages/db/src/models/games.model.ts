@@ -11,7 +11,7 @@ const gameSchema = new Schema(
 	{ collection: "game" },
 );
 // text index on name to support text search
-gameSchema.index({ name: 'text' });
+gameSchema.index({ name: "text" });
 export const Game = model("Game", gameSchema);
 
 type GameType = mongoose.InferSchemaType<typeof gameSchema>;

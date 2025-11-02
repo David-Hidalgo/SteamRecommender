@@ -1,20 +1,28 @@
 // game-card-wc.js
 class GameCardWC extends HTMLElement {
-    constructor(){
-        super();
-        this._shadow = this.attachShadow({mode:'open'});
-        this._data = null;
-    }
-    connectedCallback(){
-        // always attempt to render — if no data provided we'll show a sensible fallback
-        this._render();
-    }
-    set gameData(d){ this._data = d; this._render(); }
-    _render(){
-        const g = this._data || {};
-        const img = g.capsule || ('data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-size="22" fill="#999" dominant-baseline="middle" text-anchor="middle">Sin imagen</text></svg>`));
-    const name = (g.name || 'Sin datos').toString();
-        this._shadow.innerHTML = `
+	constructor() {
+		super();
+		this._shadow = this.attachShadow({ mode: "open" });
+		this._data = null;
+	}
+	connectedCallback() {
+		// always attempt to render — if no data provided we'll show a sensible fallback
+		this._render();
+	}
+	set gameData(d) {
+		this._data = d;
+		this._render();
+	}
+	_render() {
+		const g = this._data || {};
+		const img =
+			g.capsule ||
+			"data:image/svg+xml;utf8," +
+				encodeURIComponent(
+					`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" font-size="22" fill="#999" dominant-baseline="middle" text-anchor="middle">Sin imagen</text></svg>`,
+				);
+		const name = (g.name || "Sin datos").toString();
+		this._shadow.innerHTML = `
             <style>
                     :host{display:block}
                     .card{border-radius:12px; overflow:visible; background:transparent}
@@ -30,7 +38,13 @@ class GameCardWC extends HTMLElement {
                 <div class="name" title="${this._escape(name)}">${this._escape(name)}</div>
             </div>
         `;
-    }
-    _escape(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+	}
+	_escape(s) {
+		return String(s)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;");
+	}
 }
-customElements.define('game-card-wc', GameCardWC);
+customElements.define("game-card-wc", GameCardWC);

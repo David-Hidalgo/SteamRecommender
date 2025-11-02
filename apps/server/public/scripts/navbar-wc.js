@@ -1,24 +1,24 @@
 class NavbarWC extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
+	constructor() {
+		super();
+		this.attachShadow({ mode: "open" });
+	}
 
-  connectedCallback() {
-  // connected
-    const userJson = localStorage.getItem('user');
-    let username = 'Invitado';
-    try {
-      if (userJson) {
-        const u = JSON.parse(userJson);
-        username = u?.name ?? u?.username ?? String(u) ?? 'Invitado';
-      }
-    } catch (e) {
-      // ignore parse errors
-    }
+	connectedCallback() {
+		// connected
+		const userJson = localStorage.getItem("user");
+		let username = "Invitado";
+		try {
+			if (userJson) {
+				const u = JSON.parse(userJson);
+				username = u?.name ?? u?.username ?? String(u) ?? "Invitado";
+			}
+		} catch (e) {
+			// ignore parse errors
+		}
 
-    if (this.shadowRoot) {
-      this.shadowRoot.innerHTML = `
+		if (this.shadowRoot) {
+			this.shadowRoot.innerHTML = `
         <style>
           :host{ display:block; }
           nav{
@@ -79,7 +79,7 @@ class NavbarWC extends HTMLElement {
           </div>
           <div class="right">
             <div class="user-btn" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
-              <span class="avatar">${username.slice(0,1).toUpperCase()}</span>
+              <span class="avatar">${username.slice(0, 1).toUpperCase()}</span>
               <span style="margin-left:.25rem">${username}</span>
             </div>
             <div class="dropdown" role="menu">
@@ -90,62 +90,68 @@ class NavbarWC extends HTMLElement {
         </nav>
       `;
 
-      // Interactividad: abrir/cerrar dropdown y logout
-      const userBtn = this.shadowRoot.querySelector('.user-btn');
-      const dropdown = this.shadowRoot.querySelector('.dropdown');
-      const logoutBtn = this.shadowRoot.querySelector('.menu-logout');
-      const profileLink = this.shadowRoot.querySelector('.menu-profile');
+			// Interactividad: abrir/cerrar dropdown y logout
+			const userBtn = this.shadowRoot.querySelector(".user-btn");
+			const dropdown = this.shadowRoot.querySelector(".dropdown");
+			const logoutBtn = this.shadowRoot.querySelector(".menu-logout");
+			const profileLink = this.shadowRoot.querySelector(".menu-profile");
 
-      const onDocClick = (e) => {
-        // usar composedPath para respetar shadow DOM
-        const path = e.composedPath ? e.composedPath() : (e.path || []);
-        if (!path.includes(this)) {
-          dropdown.classList.remove('open');
-          if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
-        }
-      };
+			const onDocClick = (e) => {
+				// usar composedPath para respetar shadow DOM
+				const path = e.composedPath ? e.composedPath() : e.path || [];
+				if (!path.includes(this)) {
+					dropdown.classList.remove("open");
+					if (userBtn) userBtn.setAttribute("aria-expanded", "false");
+				}
+			};
 
-      const toggle = (ev) => {
-        ev?.stopPropagation();
-        const isOpen = dropdown.classList.toggle('open');
-        if (userBtn) userBtn.setAttribute('aria-expanded', String(isOpen));
-      };
+			const toggle = (ev) => {
+				ev?.stopPropagation();
+				const isOpen = dropdown.classList.toggle("open");
+				if (userBtn) userBtn.setAttribute("aria-expanded", String(isOpen));
+			};
 
-      userBtn?.addEventListener('click', toggle);
-      userBtn?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(ev); }
-        if (ev.key === 'Escape') { dropdown.classList.remove('open'); userBtn.setAttribute('aria-expanded','false'); }
-      });
+			userBtn?.addEventListener("click", toggle);
+			userBtn?.addEventListener("keydown", (ev) => {
+				if (ev.key === "Enter" || ev.key === " ") {
+					ev.preventDefault();
+					toggle(ev);
+				}
+				if (ev.key === "Escape") {
+					dropdown.classList.remove("open");
+					userBtn.setAttribute("aria-expanded", "false");
+				}
+			});
 
-      window.addEventListener('click', onDocClick);
+			window.addEventListener("click", onDocClick);
 
-      profileLink?.addEventListener('click', (e) => {
-        // navigate to new user profile page
-        e.preventDefault();
-        location.href = '/public/views/user/user.html';
-      });
+			profileLink?.addEventListener("click", (e) => {
+				// navigate to new user profile page
+				e.preventDefault();
+				location.href = "/public/views/user/user.html";
+			});
 
-      logoutBtn?.addEventListener('click', () => {
-        localStorage.removeItem('user');
-        location.reload();
-      });
+			logoutBtn?.addEventListener("click", () => {
+				localStorage.removeItem("user");
+				location.reload();
+			});
 
-      // Expose logout for programmatic use
-      this.logout = () => {
-        localStorage.removeItem('user');
-        location.reload();
-      };
+			// Expose logout for programmatic use
+			this.logout = () => {
+				localStorage.removeItem("user");
+				location.reload();
+			};
 
-      // Store cleanup reference for disconnectedCallback
-      this.__nav_cleanup = () => {
-        window.removeEventListener('click', onDocClick);
-      };
-    }
-  }
+			// Store cleanup reference for disconnectedCallback
+			this.__nav_cleanup = () => {
+				window.removeEventListener("click", onDocClick);
+			};
+		}
+	}
 
-  disconnectedCallback() {
-    if (this.__nav_cleanup) this.__nav_cleanup();
-  }
+	disconnectedCallback() {
+		if (this.__nav_cleanup) this.__nav_cleanup();
+	}
 }
 
-customElements.define('navbar-wc', NavbarWC);
+customElements.define("navbar-wc", NavbarWC);

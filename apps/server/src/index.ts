@@ -9,8 +9,8 @@ import { staticPlugin } from "@elysiajs/static";
 import { Elysia } from "elysia";
 import index from "./../public/index.html" with { type: "text" };
 import { plugin as gamesPlugin } from "./routes/games";
-import { plugin as usersPlugin } from "./routes/users";
 import { plugin as htmlPlugin } from "./routes/html";
+import { plugin as usersPlugin } from "./routes/users";
 
 const NOT_FOUND_PAGE_URL =
 	"https://raw.githubusercontent.com/Apple2007/ErrorCodePages/refs/heads/main/404notfound.html";
@@ -46,7 +46,7 @@ const _app = new Elysia()
 		}),
 	)
 	.use(html())
-/* 	.use(
+	/* 	.use(
 		cron({
 			name: "popularDB",
 			pattern: Patterns.everyMinute(),
