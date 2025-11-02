@@ -41,11 +41,35 @@ bun dev
 
 The API is running at [http://localhost:3000](http://localhost:3000).
 
+## Vector Search Recommendations
 
-
-
-
-
+1. **Configura las variables de entorno** en `apps/server/.env`:
+	```env
+	EMBEDDING_PROVIDER="openai" # o "gemini"
+	OPENAI_API_KEY="tu-api-key"
+	GEMINI_API_KEY="tu-api-key-de-gemini"
+	OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
+	OPENAI_EMBEDDING_DIMENSIONS="1536"
+	GEMINI_EMBEDDING_MODEL="text-embedding-004"
+	GEMINI_EMBEDDING_DIMENSIONS="768"
+	MONGODB_VECTOR_INDEX="game_embedding_index"
+	RECOMMENDER_MIN_RATING="3"
+	```
+	Cambia `EMBEDDING_PROVIDER` a `gemini` si prefieres la API de Google y ajusta el modelo/dimensiones según tu cuenta.
+2. **Instala dependencias** (incluye el cliente oficial de OpenAI):
+	```bash
+	bun install
+	```
+3. **Valida o crea el índice vectorial**: al iniciar el servidor (`bun dev`) se verifica/crea el índice definido en Atlas (`game_embedding_index`).
+4. **Genera embeddings para los juegos existentes**:
+	```bash
+	bun workspace @SteamRecommender/db run backfill:embeddings
+	```
+	El script rellena únicamente los juegos sin vector y hace pequeñas pausas para respetar los límites de la API.
+5. **Endpoint de recomendaciones**: `GET /api/games/recommendations` ahora usa embeddings automáticamente (con fallback colaborativo). También puedes llamar explícitamente a `GET /api/games/vector-recommendations`, que acepta alguno de los parámetros:
+	- `userId` o `email`: promedia los embeddings de juegos calificados por el usuario.
+	- `appid` o `gameId`: busca juegos parecidos al especificado.
+	- `text`: genera recomendaciones a partir de una descripción libre.
 
 ## Project Structure
 

@@ -12,7 +12,8 @@
 		}
 	},
 	"scripts": {
-		"build": "tsdown"
+		"build": "tsdown",
+		"backfill:embeddings": "bun run ./src/scripts/backfillGameEmbeddings.ts"
 	},
 	"devDependencies": {
 		"tsdown": "catalog:"
@@ -21,8 +22,12 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"mongoose": "^8.14.0",
+		"@google/generative-ai": "^0.3.0",
+		"@xenova/transformers": "^2.17.2",
 		"dotenv": "catalog:",
+		"mongodb": "^6.20.0",
+		"mongoose": "^8.14.0",
+		"openai": "^4.58.1",
 		"zod": "catalog:"
 	}
 }

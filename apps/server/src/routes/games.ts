@@ -7,6 +7,11 @@ import {
 	recommendGamesByPublisher,
 	recommendByGameContext,
 } from "@SteamRecommender/db/recommender";
+import {
+	recommendSimilarGamesForApp,
+	recommendSimilarGamesForUser,
+	recommendSimilarGamesForText,
+} from "@SteamRecommender/db/vector-search";
 // Intentamos usar el cliente nativo exportado por el paquete db
 
 export const plugin = <T extends string>(config: { prefix: T }) =>
@@ -173,15 +178,103 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					const { status } = ctx;
 					if (!userId) return status(400, { message: "userId query param is required" });
 					try {
-						const recs = await recommendForUserCollaborative(String(userId), Number(limit) || 20);
-						return recs;
+						const parsedLimit = Number(limit);
+						const effectiveLimit = Number.isFinite(parsedLimit)
+							? Math.min(Math.max(Math.floor(parsedLimit), 1), 50)
+							: 20;
+						const vectorRecs = await recommendSimilarGamesForUser({
+							userId: String(userId),
+							limit: effectiveLimit,
+						});
+						if (Array.isArray(vectorRecs) && vectorRecs.length > 0) {
+							return vectorRecs;
+						}
+						const fallback = await recommendForUserCollaborative(
+							String(userId),
+							effectiveLimit,
+						);
+						return fallback;
 					} catch (err) {
-						console.error("Error running recommendForUserCollaborative:", err);
+						console.error("Error generating user recommendations:", err);
 						return status(500, { message: "Internal Server Error" });
 					}
 				},
 				{
 					query: t.Object({ userId: t.String(), limit: t.Optional(t.Number()) }),
 				},
-			),
+			)
+			.get(
+				"/vector-recommendations",
+				async ({ query, status }) => {
+					const params = query as Record<string, string | undefined>;
+					const rawLimit = params?.limit ? Number(params.limit) : Number.NaN;
+					const limit = Number.isFinite(rawLimit)
+						? Math.min(Math.max(Math.floor(rawLimit), 1), 50)
+						: 10;
+					try {
+						if (params?.userId || params?.email) {
+							return await recommendSimilarGamesForUser({
+								userId: params.userId,
+								email: params.email,
+								limit,
+							});
+						}
+						if (params?.appid || params?.gameId) {
+							const identifier = params.appid ?? params.gameId;
+							const numeric = identifier && !Number.isNaN(Number(identifier))
+								? Number(identifier)
+								: undefined;
+							return await recommendSimilarGamesForApp({
+								appid: numeric ?? identifier,
+								gameId: params.gameId,
+								limit,
+							});
+						}
+						if (params?.text) {
+							return await recommendSimilarGamesForText({
+								text: params.text,
+								limit,
+							});
+						}
+						return status(400, {
+							message:
+								"Proporciona userId/email, appid/gameId o text para obtener recomendaciones.",
+						});
+					} catch (error) {
+						console.error("Error generating vector recommendations", error);
+						return status(503, {
+							message: "No se pudieron generar recomendaciones en este momento.",
+							detail: error instanceof Error ? error.message : String(error),
+						});
+					}
+				},
+				{
+					query: t.Object({
+						userId: t.Optional(t.String()),
+						email: t.Optional(t.String()),
+						appid: t.Optional(t.String()),
+						gameId: t.Optional(t.String()),
+						text: t.Optional(t.String()),
+						limit: t.Optional(t.String()),
+					}),
+					response: {
+						200: t.Array(
+							t.Object({
+								_id: t.String(),
+								appid: t.Optional(t.Number()),
+								name: t.Optional(t.String()),
+								score: t.Number(),
+								capsule: t.Optional(t.String()),
+								release_date: t.Optional(t.Any()),
+								vectorIndex: t.String(),
+							}),
+						),
+						400: t.Object({ message: t.String() }),
+						503: t.Object({
+							message: t.String(),
+							detail: t.Optional(t.String()),
+						}),
+					},
+				},
+			)
 	);
