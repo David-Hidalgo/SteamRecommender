@@ -17,7 +17,7 @@ export const auth = betterAuth({
 	},
 	user: {
 		additionalFields: {
-			gamePreferences: { type: "json", required: true },
+			gamePreferences: { type: "json" },
 			wishlist: { type: "json" },
 		},
 	},
