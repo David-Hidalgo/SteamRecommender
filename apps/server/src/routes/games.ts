@@ -42,7 +42,7 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					try {
 						// If there are user ratings, we could aggregate; for now return random sample with consistent shape
 						const sample = await GameModel.aggregate([
-							{ $sample: { size: 10 } },
+							{ $sample: { size: 24 } },
 							{
 								$project: { appid: 1, name: 1, capsule: "$data.capsule_image" },
 							},
