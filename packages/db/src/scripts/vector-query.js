@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import { getEmbedding } from "./get-embeddings.js";
 
 // MongoDB connection URI and options
-const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(process.env.DATABASE_URL);
 
 async function run() {
 	try {
@@ -29,12 +29,13 @@ async function run() {
 			},
 			{
 				$project: {
-					_id: 1,
-					appid: 1,
-					name: 1,
+					_id: 1,							
+					appid:1,
+					name:1,
 					score: { $meta: "vectorSearchScore" },
 					capsule: "$data.capsule_image",
 					release_date: "$data.release_date",
+					vectorIndex: "$data.vectorIndex"
 				},
 			},
 		];
