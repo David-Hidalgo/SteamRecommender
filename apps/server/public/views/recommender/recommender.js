@@ -1,10 +1,11 @@
 // Recommender page: fetch vector recommendations for current user and render
+import "../../scripts/game-card-wc.js";
 
 async function fetchUserVectorRecs({ email, userId, limit = 24 } = {}) {
 	const params = new URLSearchParams();
 	if (email) params.set("email", email);
-	if (userId) params.set("userId", userId);
 	params.set("limit", String(limit));
+	console.log("Fetching vector recs with params:", params.toString());
 	const res = await fetch(
 		`/api/games/vector-recommendations/user?${params.toString()}`,
 	);
@@ -12,9 +13,10 @@ async function fetchUserVectorRecs({ email, userId, limit = 24 } = {}) {
 	return await res.json();
 }
 
+
 function createCardForGame(g) {
 	const appid = g?.appid ?? null;
-	const name = g?.name ?? (g?.game && g.game.name) ?? "Sin título";
+	const name = g?.name ?? g?.game?.name ?? "Sin título";
 	const capsule = g?.capsule ?? g?.data?.capsule_image ?? null;
 
 	const el = document.createElement("game-card-wc");
@@ -36,9 +38,9 @@ function createCardForGame(g) {
 	// safety timeout
 	const safety = setTimeout(() => {
 		try {
-			const img = el.shadowRoot && el.shadowRoot.querySelector("img");
+			const img = el.shadowRoot?.querySelector("img");
 			if (!img || img.naturalWidth === 0) el.remove();
-		} catch (e) {}
+		} catch (_e) {}
 	}, 6000);
 	el.addEventListener("img-load", () => clearTimeout(safety), { once: true });
 
@@ -55,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	let me = null;
 	try {
 		me = JSON.parse(localStorage.getItem("user") || "null");
-	} catch (e) {
+	} catch (_e) {
 		me = null;
 	}
 	if (!me || (!me.email && !me._id)) {
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			status.textContent = "No hay recomendaciones disponibles por ahora.";
 			return;
 		}
-
+		console.log("Vector recommendations received:", res);
 		container.innerHTML = "";
 		for (const g of res) {
 			// normalize shape

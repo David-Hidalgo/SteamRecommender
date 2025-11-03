@@ -182,6 +182,9 @@ export type GameRecommendation = {
 	capsule?: string;
 	release_date?: unknown;
 	vectorIndex: string;
+	seedGameId?: string;
+	seedAppid?: number;
+	seedRating?: number;
 };
 
 const mapRecommendation = (doc: any): GameRecommendation => {
@@ -423,7 +426,6 @@ export const recommendSimilarGamesForUser = async (params: {
 	console.log("Usuario encontrado:", user);
 	if (!user) return [];
 	const prefs = Array.isArray(user.gamePreferences) ? user.gamePreferences : [];
-	console.log("Preferencias del usuario encontradas:", inspect(prefs));
 	const minRating = params.minRating ?? MIN_USER_RATING;
 	const vectors: {
 		vector: number[];
@@ -460,44 +462,98 @@ export const recommendSimilarGamesForUser = async (params: {
 			gameId,
 		});
 	}
-	console.log(
-		"Vectores de preferencias del usuario encontrados:",
-		inspect(vectors),
-	);
 	if (vectors.length === 0) return [];
-	const dimension = vectors[0]?.vector?.length ?? 0;
-	if (dimension === 0) return [];
-	const accumulator = new Array<number>(dimension).fill(0);
-	let weightTotal = 0;
+	/* const excludeAppIdsSet = new Set<number>();
 	for (const item of vectors) {
-		if (!Array.isArray(item.vector) || item.vector.length !== dimension)
-			continue;
-		for (let i = 0; i < dimension; i += 1) {
-			const component = item.vector[i];
-			if (typeof component !== "number") continue;
-			const current = accumulator[i] ?? 0;
-			accumulator[i] = current + component * item.weight;
-		}
-		weightTotal += item.weight;
+		if (typeof item.appid === "number") excludeAppIdsSet.add(item.appid);
 	}
-	if (weightTotal === 0) return [];
-	const preferenceVector = accumulator.map((value) => value / weightTotal);
-	const excludeAppIds = vectors
-		.map((item) => item.appid)
-		.filter((appid): appid is number => typeof appid === "number");
 	const wishlist = Array.isArray(user.wishlist) ? user.wishlist : [];
 	for (const entry of wishlist) {
 		const wGame: any = entry?.gameId;
 		if (wGame && typeof wGame.appid === "number") {
-			excludeAppIds.push(wGame.appid);
+			excludeAppIdsSet.add(wGame.appid);
+		}
+	} */
+	const ratedGameIds = new Set<mongoose.Types.ObjectId | string>();
+	for (const item of vectors) {
+		if (item.gameId) ratedGameIds.add(item.gameId);
+	}
+	const recommendations: GameRecommendation[] = [];
+	const perVectorLimit = 2;
+	for (const item of vectors) {
+		const queryVector = item.vector.map((dim) =>
+			typeof dim === "number" ? dim : Number(dim),
+		);
+		if (queryVector.some((dim) => !Number.isFinite(dim))) {
+			console.warn(
+				"Vector inválido detectado para el juego semilla",
+				item.gameId.toString(),
+			);
+			continue;
+		}
+		const excludeIdsSet = new Set<mongoose.Types.ObjectId | string>(
+			ratedGameIds,
+		);
+		if (item.gameId) excludeIdsSet.add(item.gameId);
+		/* const recs = await recommendSimilarGamesByVector({
+			vector: queryVector,
+			limit: perVectorLimit,
+			numCandidates: params.numCandidates,
+			excludeIds: Array.from(excludeIdsSet),
+			excludeAppIds:
+				excludeAppIdsSet.size > 0 ? Array.from(excludeAppIdsSet) : undefined,
+		}); */
+		const pipeline = [
+			{
+				$vectorSearch: {
+					index: "vector_index",
+					queryVector,
+					path: "embedding",
+					exact: true,
+					limit: 5,
+				},
+			},
+			{
+				$project: {
+					_id: 1,
+					appid: 1,
+					name: 1,
+					score: { $meta: "vectorSearchScore" },
+					capsule: "$data.capsule_image",
+					release_date: "$data.release_date",
+					vectorIndex: "$data.vectorIndex",
+				},
+			},
+		];
+
+		// run pipeline
+		const result = await client
+			.collection("game")
+			.aggregate(pipeline)
+			.toArray();
+
+		// print results
+		for await (const doc of result) {
+			console.dir(JSON.stringify(doc));
+		}
+		const recs = result.map(mapRecommendation);
+
+		for (const rec of recs) {
+			const enriched: GameRecommendation = {
+				...rec,
+				seedGameId: item.gameId.toString(),
+				seedAppid: item.appid,
+				seedRating: item.weight,
+			};
+			recommendations.push(enriched);
+			if (params.limit && recommendations.length >= params.limit) {
+				return recommendations;
+			}
 		}
 	}
-	return recommendSimilarGamesByVector({
-		vector: preferenceVector,
-		limit: params.limit,
-		numCandidates: params.numCandidates,
-		excludeAppIds,
-	});
+	return params.limit
+		? recommendations.slice(0, params.limit)
+		: recommendations;
 };
 
 export const recommendSimilarGamesForText = async (params: {
