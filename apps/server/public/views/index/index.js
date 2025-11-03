@@ -93,7 +93,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 			el.setAttribute("name", String(g.name ?? ""));
 			// pass capsule fallback to the component when available
 			if (g.capsule) el.setAttribute("capsule", g.capsule);
-			container.appendChild(el);
+			// Wrap the card in a native link to guarantee navigation even if
+			// Shadow DOM event propagation behaves unexpectedly in some browsers
+			const link = document.createElement("a");
+			link.href = `/public/views/games/game.html?appid=${encodeURIComponent(
+				String(g.appid),
+			)}`;
+			link.style.display = "block";
+			link.style.textDecoration = "none";
+			link.appendChild(el);
+			container.appendChild(link);
 
 			// remove the card if image fails (component will dispatch 'img-error')
 			el.addEventListener(

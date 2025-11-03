@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY;
-const MODEL_NAME = process.env.GOOGLE_EMBEDDING_MODEL;
+const API_KEY = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY;
+const MODEL_NAME = process.env.GEMINI_EMBEDDING_MODEL;
 
 if (!API_KEY) {
 	throw new Error(
@@ -18,7 +18,7 @@ if (!MODEL_NAME) {
 const googleGenAI = new GoogleGenAI({ apiKey: API_KEY });
 
 // Generates an embedding vector using the Gemini embeddings model.
-export const getEmbedding = async (text) => {
+export const getEmbedding = async (text: string) => {
 	const clean = typeof text === "string" ? text.trim() : "";
 	if (clean.length === 0) {
 		throw new Error("El texto para generar embedding está vacío.");

@@ -1,0 +1,24 @@
+/* Recommender page styles — reuse card grid from index */
+.cards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1.15rem;
+	margin: 1.5rem 0;
+}
+
+.page-title {
+	color: var(--text);
+}
+.subtitle {
+	color: var(--muted);
+}
+
+#rec-status {
+	padding: 16px 0;
+}
+
+@media (max-width: 640px) {
+	.cards-grid {
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	}
+}

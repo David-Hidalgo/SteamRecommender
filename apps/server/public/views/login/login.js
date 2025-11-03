@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				localStorage.setItem("user", JSON.stringify(user));
 			} catch (e) {}
 			// Redirect to user profile page
-			location.href = "/public/views/users/users.html";
+			location.href = "/public/views/user/user.html";
 		} catch (err) {
 			error.textContent = "Error de conexión: " + String(err);
 		}

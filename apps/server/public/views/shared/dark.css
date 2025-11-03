@@ -17,6 +17,17 @@ body {
 	color: var(--text);
 }
 
+/* Headings */
+h1 {
+	color: whitesmoke;
+}
+h2 {
+	color: whitesmoke;
+}
+h3 {
+	color: whitesmoke;
+}
+
 /* generic surface */
 .surface {
 	background: var(--surface);

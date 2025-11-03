@@ -14,7 +14,7 @@ async function run() {
 		const collection = database.collection("game");
 
 		// Generate embedding for the search query
-		const queryEmbedding = await getEmbedding("pelota");
+		const queryEmbedding = await getEmbedding(text);
 
 		// Define the sample vector search pipeline
 		const pipeline = [

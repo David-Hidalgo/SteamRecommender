@@ -65,12 +65,77 @@ function showSelectionPanel(game) {
 		el("div", { class: "game-title" }, game.name),
 		el("div", {}, `AppID: ${game.appid}`),
 	);
-	const ratingSelect = el("select", {});
-	[5, 4, 3, 2, 1].forEach((v) =>
-		ratingSelect.appendChild(el("option", { value: v }, String(v))),
-	);
-	ratingSelect.className = "rating-select-styled";
-	ratingSelect.value = "3";
+	// Star rating control (replaces the select)
+	let ratingValue = 3;
+	const ratingDiv = el("div", {
+		class: "star-rating",
+		role: "radiogroup",
+		"aria-label": "Rating",
+	});
+	const ratingLabel = el("span", { class: "rating-label" }, `(${ratingValue})`);
+
+	function updateStars(value) {
+		const stars = Array.from(ratingDiv.querySelectorAll(".star"));
+		stars.forEach((s, idx) => {
+			const i = idx + 1;
+			if (i <= value) {
+				s.classList.add("filled");
+				s.setAttribute("aria-checked", "true");
+			} else {
+				s.classList.remove("filled");
+				s.setAttribute("aria-checked", "false");
+			}
+		});
+		ratingLabel.textContent = `(${value})`;
+	}
+
+	for (let i = 1; i <= 5; i++) {
+		const star = el(
+			"span",
+			{
+				class: "star",
+				tabindex: 0,
+				role: "radio",
+				"aria-checked": i <= ratingValue,
+			},
+			"★",
+		);
+
+		// hover preview
+		star.addEventListener("mouseover", () => updateStars(i));
+		star.addEventListener("focus", () => updateStars(i));
+		// restore to selected value when leaving
+		star.addEventListener("mouseout", () => updateStars(ratingValue));
+		star.addEventListener("blur", () => updateStars(ratingValue));
+
+		// click / keyboard select
+		star.addEventListener("click", () => {
+			ratingValue = i;
+			updateStars(ratingValue);
+		});
+		star.addEventListener("keydown", (ev) => {
+			if (ev.key === "Enter" || ev.key === " ") {
+				ev.preventDefault();
+				ratingValue = i;
+				updateStars(ratingValue);
+			} else if (ev.key === "ArrowLeft") {
+				ev.preventDefault();
+				ratingValue = Math.max(1, ratingValue - 1);
+				updateStars(ratingValue);
+				// move focus to appropriate star
+				const target = ratingDiv.querySelectorAll(".star")[ratingValue - 1];
+				if (target) target.focus();
+			} else if (ev.key === "ArrowRight") {
+				ev.preventDefault();
+				ratingValue = Math.min(5, ratingValue + 1);
+				updateStars(ratingValue);
+				const target = ratingDiv.querySelectorAll(".star")[ratingValue - 1];
+				if (target) target.focus();
+			}
+		});
+		ratingDiv.appendChild(star);
+	}
+	updateStars(ratingValue);
 
 	const notes = el("textarea", {
 		placeholder: "Notas (opcional)",
@@ -107,7 +172,7 @@ function showSelectionPanel(game) {
 			const body = {
 				email: u.email,
 				gameId: gameIdToSend,
-				rating: Number(ratingSelect.value),
+				rating: Number(ratingValue),
 				notes: notes.value,
 			};
 			const res = await fetch("/api/users/preference/email", {
@@ -160,7 +225,7 @@ function showSelectionPanel(game) {
 		"div",
 		{ style: "display:flex; flex-direction:column; gap:8px; flex:1" },
 		el("div", { class: "meta" }, `AppID: ${game.appid}`),
-		el("div", {}, el("label", {}, "Rating: "), ratingSelect),
+		el("div", {}, el("label", {}, "Rating: "), ratingDiv, ratingLabel),
 		notes,
 		el(
 			"div",
@@ -251,5 +316,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 				searchBtn.click();
 			}
 		});
+	}
+
+	// If the page was opened with a query param ?q=gameName (from 'Modificar rating'),
+	// prefill the input and trigger a search so the game appears in the results.
+	try {
+		const params = new URLSearchParams(location.search);
+		const initial =
+			params.get("q") || params.get("name") || params.get("appid");
+		if (initial && q && searchBtn) {
+			q.value = decodeURIComponent(initial);
+			// small timeout to allow UI to settle
+			setTimeout(() => searchBtn.click(), 50);
+		}
+	} catch (e) {
+		// ignore malformed URL
 	}
 });

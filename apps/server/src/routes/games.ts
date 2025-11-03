@@ -1,4 +1,3 @@
-import { User } from "@SteamRecommender/db/models/auth.model";
 import { Game as GameModel } from "@SteamRecommender/db/models/games.model";
 import {
 	recommendByGameContext,
@@ -23,6 +22,25 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 	}).group("/games", (app) =>
 		app
 			.get("/", () => "Games endpoint")
+			.get(
+				"/appid/:appid",
+				async (ctx: any) => {
+					const { appid } = ctx.params || {};
+					try {
+						const game = await GameModel.findOne({ appid: Number(appid) })
+							.lean()
+							.exec();
+						if (!game) return { status: 404, body: "Game not found" };
+						return game;
+					} catch (err) {
+						console.error("Error reading game by appid from DB:", err);
+						return { status: 500, body: "Internal Server Error" };
+					}
+				},
+				{
+					params: t.Object({ appid: t.Number() }),
+				},
+			)
 			.get(
 				"/id/:id",
 				async (ctx: any) => {
@@ -352,6 +370,8 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 									"Proporciona text para obtener recomendaciones basadas en texto.",
 							});
 						}
+						console.log(params);
+
 						return await recommendSimilarGamesForText({
 							text: params.text,
 							limit,

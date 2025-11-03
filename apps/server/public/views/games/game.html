@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Juego - SteamRecommender</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css" />
+    <link rel="stylesheet" href="/public/views/shared/dark.css" />
+    <script src="/public/scripts/dark-mode.js"></script>
+    <script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+    <link rel="stylesheet" href="/public/views/games/game.css" />
+</head>
+<body>
+    <navbar-wc></navbar-wc>
+    <div class="container">
+
+        <section id="game-section">
+            <div id="status">Cargando información del juego...</div>
+
+            <div id="game-detail" style="display:none">
+                <div id="banner-wrap">
+                            <img id="banner-img" alt="Banner del juego" />
+                        </div>
+                <div id="game-layout">
+                    <div id="game-main">
+                        <h2 id="name" class="game-name"></h2>
+                        <p id="short-desc" class="muted"></p>
+                        <div id="carousel" aria-label="Capturas del juego">
+                            <button id="carousel-prev" class="carousel-btn" type="button" aria-label="Anterior">&#10094;</button>
+                            <div class="carousel-window">
+                                <div id="gallery" class="carousel-track"></div>
+                            </div>
+                            <button id="carousel-next" class="carousel-btn" type="button" aria-label="Siguiente">&#10095;</button>
+                        </div>
+                        <div id="carousel-dots" class="carousel-dots"></div>
+                    </div>
+                    <aside id="meta-card">
+                        <h3>Detalles</h3>
+                        <dl>
+                            <div class="meta-row">
+                                <dt>Publisher</dt>
+                                <dd id="publisher">No disponible</dd>
+                            </div>
+                            <div class="meta-row">
+                                <dt>Fecha de lanzamiento</dt>
+                                <dd id="release-date">No disponible</dd>
+                            </div>
+                        </dl>
+                       
+                    </aside>
+                            </section>
+        <section id="similar-section" class="similar-section">
+            <button id="similar-btn" type="button" class="similar-btn">
+                Ver más juegos como este
+            </button>
+            <div style="margin-top:12px">
+                <button id="add-pref-btn" class="similar-btn" type="button">Agregar a preferencias</button>
+            </div>
+            <div
+                id="similar-grid"
+                class="similar-grid"
+                role="list"
+                aria-live="polite"
+            ></div>
+            
+        </section>
+    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="/public/views/games/game.js"></script>
+</body>
+</html>

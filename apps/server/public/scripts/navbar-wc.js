@@ -73,10 +73,12 @@ class NavbarWC extends HTMLElement {
               <span>SteamRecommender</span>
             </div>
           </div>
-          <div class="center">
-            <a class="button" href="/public/index.html">Inicio</a>
-            <a class="button" href="/public/views/games/games.html">Juegos</a>
-          </div>
+					<div class="center">
+						<a class="button" href="/public/index.html">Inicio</a>
+						<a class="button" href="/public/views/game-preferences/game-preferences.html">Agregar preferencias</a>
+						<a class="button" href="/public/views/buscador-inteligente/buscador-inteligente.html">Recomendador</a>
+						<a class="button" href="/public/views/recommender/recommender.html">Recomendador personal</a>
+					</div>
           <div class="right">
             <div class="user-btn" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
               <span class="avatar">${username.slice(0, 1).toUpperCase()}</span>

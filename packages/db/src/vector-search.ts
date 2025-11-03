@@ -1,50 +1,27 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { inspect } from "bun";
 import type { Document } from "mongoose";
 import mongoose from "mongoose";
-import OpenAI from "openai";
 import { client } from "./index";
 import { User } from "./models/auth.model";
 import { Game, type GameType } from "./models/games.model";
+import { getEmbedding } from "./scripts/get-embeddings";
 
-const EMBEDDING_PROVIDER = (
-	process.env.EMBEDDING_PROVIDER || "openai"
-).toLowerCase();
 const VECTOR_INDEX_NAME =
 	process.env.MONGODB_VECTOR_INDEX || "game_embedding_index";
-const OPENAI_EMBEDDING_MODEL =
-	process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 const GEMINI_EMBEDDING_MODEL =
 	process.env.GEMINI_EMBEDDING_MODEL || "text-embedding-004";
-const ACTIVE_EMBEDDING_MODEL =
-	EMBEDDING_PROVIDER === "gemini"
-		? GEMINI_EMBEDDING_MODEL
-		: OPENAI_EMBEDDING_MODEL;
+const ACTIVE_EMBEDDING_MODEL = GEMINI_EMBEDDING_MODEL;
 
 const EMBEDDING_DIMENSIONS = Number(
 	process.env.EMBEDDING_DIMENSIONS ??
-		(EMBEDDING_PROVIDER === "gemini"
-			? (process.env.GEMINI_EMBEDDING_DIMENSIONS ?? "768")
-			: (process.env.OPENAI_EMBEDDING_DIMENSIONS ?? "1536")),
+		process.env.GEMINI_EMBEDDING_DIMENSIONS ??
+		"768",
 );
 
 const MIN_USER_RATING = Number(process.env.RECOMMENDER_MIN_RATING || "3");
 
-let openAIClient: OpenAI | null = null;
-let geminiClient: GoogleGenerativeAI | null = null;
-
-const getOpenAIClient = () => {
-	const apiKey = process.env.OPENAI_API_KEY;
-	if (!apiKey || apiKey.trim().length === 0) {
-		throw new Error(
-			"OPENAI_API_KEY no está configurada. Configúrala para generar embeddings.",
-		);
-	}
-	if (!openAIClient) {
-		openAIClient = new OpenAI({ apiKey });
-	}
-	return openAIClient;
-};
+let geminiClient: GoogleGenAI | null = null;
 
 const getGeminiClient = () => {
 	const apiKey = process.env.GEMINI_API_KEY;
@@ -54,7 +31,7 @@ const getGeminiClient = () => {
 		);
 	}
 	if (!geminiClient) {
-		geminiClient = new GoogleGenerativeAI(apiKey);
+		geminiClient = new GoogleGenAI({ apiKey });
 	}
 	return geminiClient;
 };
@@ -263,27 +240,21 @@ export const generateEmbeddingForText = async (
 	if (clean.length === 0) {
 		throw new Error("El texto para generar embedding está vacío.");
 	}
-	if (EMBEDDING_PROVIDER === "gemini") {
-		const gemini = getGeminiClient();
-		const model = gemini.getGenerativeModel({ model: GEMINI_EMBEDDING_MODEL });
-		const result = await model.embedContent(clean);
-		const vector = result?.embedding?.values;
-		if (!Array.isArray(vector) || vector.length === 0) {
-			throw new Error("No se recibió un embedding válido desde Gemini.");
-		}
-		return vector as number[];
-	}
-
-	const openai = getOpenAIClient();
-	const response = await openai.embeddings.create({
-		model: OPENAI_EMBEDDING_MODEL,
-		input: clean,
+	const gemini = getGeminiClient();
+	const result = await gemini.models.embedContent({
+		model: GEMINI_EMBEDDING_MODEL,
+		contents: [
+			{
+				role: "user",
+				parts: [{ text: clean }],
+			},
+		],
 	});
-	const vector = response.data?.[0]?.embedding;
+	const vector = result?.embeddings?.[0]?.values;
 	if (!Array.isArray(vector) || vector.length === 0) {
-		throw new Error("No se recibió un embedding válido desde OpenAI.");
+		throw new Error("No se recibió un embedding válido desde Gemini.");
 	}
-	return vector;
+	return vector as number[];
 };
 
 export const ensureGameEmbedding = async (
@@ -332,6 +303,12 @@ export const ensureGameEmbedding = async (
 			`No se pudo construir un texto descriptivo para el juego ${gameDoc.name ?? gameDoc._id}`,
 		);
 	}
+	console.log("\n\n\n\n\n\n\n");
+
+	console.log(text);
+
+	console.log("\n\n\n\n\n\n\n");
+
 	const vector = await generateEmbeddingForText(text);
 	await Game.updateOne(
 		{ _id: gameDoc._id },
@@ -386,10 +363,16 @@ export const recommendSimilarGamesForApp = async (params: {
 		.lean()
 		.exec();
 	if (!target) return [];
+	console.log("\n\n\n\n\n\n\n");
+
+	console.log(target);
+
+	console.log("\n\n\n\n\n\n\n");
 	let vector =
 		Array.isArray(target.embedding) && target.embedding.length > 0
 			? target.embedding
 			: null;
+
 	if (!vector && params.autoGenerateIfMissing !== false) {
 		const ensured = await ensureGameEmbedding(
 			target as GameType & { _id: mongoose.Types.ObjectId },
@@ -398,7 +381,9 @@ export const recommendSimilarGamesForApp = async (params: {
 	}
 	if (!vector) {
 		throw new Error(
-			`El juego ${target.name ?? target._id} no tiene embedding generado. Ejecuta el script de backfill o configura OPENAI_API_KEY.`,
+			`El juego ${
+				target.name ?? target._id
+			} no tiene embedding generado. Ejecuta el script de backfill o configura GEMINI_API_KEY.`,
 		);
 	}
 	return recommendSimilarGamesByVector({
@@ -520,10 +505,38 @@ export const recommendSimilarGamesForText = async (params: {
 	limit?: number;
 	numCandidates?: number;
 }): Promise<GameRecommendation[]> => {
-	const vector = await generateEmbeddingForText(params.text);
-	return recommendSimilarGamesByVector({
-		vector,
-		limit: params.limit,
-		numCandidates: params.numCandidates,
-	});
+	const vector = await getEmbedding(params.text);
+	console.log(vector);
+
+	const pipeline = [
+		{
+			$vectorSearch: {
+				index: "vector_index",
+				queryVector: vector,
+				path: "embedding",
+				exact: true,
+				limit: 5,
+			},
+		},
+		{
+			$project: {
+				_id: 1,
+				appid: 1,
+				name: 1,
+				score: { $meta: "vectorSearchScore" },
+				capsule: "$data.capsule_image",
+				release_date: "$data.release_date",
+				vectorIndex: "$data.vectorIndex",
+			},
+		},
+	];
+
+	// run pipeline
+	const result = await client.collection("game").aggregate(pipeline).toArray();
+
+	// print results
+	for await (const doc of result) {
+		console.dir(JSON.stringify(doc));
+	}
+	return result.map(mapRecommendation);
 };

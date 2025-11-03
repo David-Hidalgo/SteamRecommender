@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+	<title>Buscador inteligente — SteamRecommender</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tacit-css@1.9.1/dist/tacit-css.min.css"/>
+	<script type="module" src="/public/scripts/footer-wc.js"></script>
+	<link rel="stylesheet" href="/public/views/shared/dark.css" />
+	<script src="/public/scripts/dark-mode.js"></script>
+	<script type="module" src="/public/scripts/navbar-wc.js?v=2"></script>
+	<link rel="stylesheet" href="/public/views/buscador-inteligente/buscador-inteligente.css" />
+</head>
+<body>
+	<navbar-wc></navbar-wc>
+	<main style="padding:1rem 1.25rem;">
+		<div style="max-width:1100px;margin:0 auto">
+			<section class="hero">
+				<div class="hero-inner">
+					<h1 class="page-title" style="text-align:center">Buscador inteligente</h1>
+					<p class="subtitle" style="text-align:center;color:var(--muted,#9a9aa6);margin:0 0 6px 0">Busca juegos por nombre. Presiona Enter o el botón de buscar.</p>
+					<div class="search-bar-wrap">
+						<input id="search-input" class="search-input" type="search" placeholder="Buscar juegos, p. ej. 'Portal'" aria-label="Buscar juegos" />
+						<button id="search-btn" class="search-btn" aria-label="Buscar">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+							<span class="btn-text">Buscar</span>
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<section id="top-games-section">
+				<div id="top-games" class="cards-grid"></div>
+			</section>
+		</div>
+	</main>
+	<footer-wc></footer-wc>
+	<script type="module" src="/public/views/buscador-inteligente/buscador-inteligente.js"></script>
+</body>
+</html>

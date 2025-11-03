@@ -1,4 +1,7 @@
-/* Styles for game-preferences page (borrowed from users.css) */
+.container h1 {
+	color: whitesmoke;
+}
+
 .cards {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -65,12 +68,21 @@
 }
 .notes-input {
 	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
 	min-height: 80px;
 	padding: 8px;
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.02);
 	color: #e8e8ee;
 	border: 1px solid rgba(255, 255, 255, 0.04);
+	resize: vertical;
+	overflow: auto;
+}
+
+/* help flex children with long content to shrink properly */
+.selection-card > * {
+	min-width: 0;
 }
 .btn-primary {
 	background: linear-gradient(90deg, #7b1fa2, #8e24aa);
@@ -93,4 +105,91 @@
 	color: var(--muted, #cfcfcf);
 	padding: 14px;
 	text-align: center;
+}
+.search-bar-wrap {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+
+.search-input {
+	flex: 1 1 560px;
+	max-width: 760px;
+	padding: 14px 16px;
+	border-radius: 28px;
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.02),
+		rgba(0, 0, 0, 0.12)
+	);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	color: var(--text);
+	font-size: 1rem;
+	outline: none;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) inset;
+}
+
+.search-input::placeholder {
+	color: var(--muted);
+}
+
+.search-input:focus {
+	box-shadow:
+		0 6px 24px rgba(0, 0, 0, 0.6) inset,
+		0 0 0 4px rgba(106, 209, 255, 0.05);
+	border-color: rgba(106, 209, 255, 0.25);
+}
+
+.search-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border-radius: 999px;
+	background: linear-gradient(180deg, #1b1e24, #101217);
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.search-btn svg {
+	color: var(--accent);
+	opacity: 0.95;
+}
+
+.search-btn:active {
+	transform: translateY(1px);
+}
+
+/* Star rating styles (used by add-preference selection panel) */
+.star-rating {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+}
+.star-rating .star {
+	font-size: 1.35rem;
+	line-height: 1;
+	cursor: pointer;
+	color: rgba(255, 255, 255, 0.22);
+	user-select: none;
+	transition:
+		color 120ms ease,
+		transform 80ms ease;
+}
+.star-rating .star.filled {
+	color: var(--accent, #ffd054);
+	transform: translateY(-2px);
+}
+.star-rating .star:focus {
+	outline: 2px solid rgba(106, 209, 255, 0.12);
+	outline-offset: 4px;
+}
+.rating-label {
+	margin-left: 8px;
+	color: var(--muted, #cfcfcf);
+	font-size: 0.95rem;
 }

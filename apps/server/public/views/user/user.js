@@ -95,6 +95,15 @@ function renderPreferences(user) {
 	}
 	container.style.display = "";
 
+	// current user (read from localStorage so handlers can use it)
+	const me = (() => {
+		try {
+			return JSON.parse(localStorage.getItem("user") || "null");
+		} catch (e) {
+			return null;
+		}
+	})();
+
 	for (const p of prefs) {
 		const g = p.gameId && p.gameId.appid ? p.gameId : p.gameId || {};
 		const title = g.name || g.data?.name || String(g.appid || g._id || "");
@@ -104,41 +113,50 @@ function renderPreferences(user) {
 				? `https://cdn.akamai.steamstatic.com/steam/apps/${g.appid}/header.jpg`
 				: "");
 
-		const left = el(
-			"div",
-			{},
-			el("img", {
-				src: thumb,
-				alt: title,
-				style: "width:160px;height:88px;object-fit:cover;border-radius:6px",
-			}),
+		// create image element (larger horizontal) and info column
+		// image: do not set inline width/height so CSS can control sizing
+		const imgEl = el("img", {
+			src: thumb,
+			alt: title,
+		});
+
+		const left = el("div", { class: "left-col" }, imgEl);
+
+		const titleEl = el("div", { class: "card-title" }, title);
+		const ratingEl = createRatingStars(p.rating || 0);
+		ratingEl.className = "rating-stars";
+
+		const modifyBtn = el(
+			"button",
+			{
+				class: "btn-ghost",
+				type: "button",
+				style: "background:#7b1fa2;color:#fff",
+			},
+			"Modificar rating",
 		);
+		const removeBtn = el(
+			"button",
+			{
+				class: "btn-ghost",
+				type: "button",
+				style: "background:#7b1fa2;color:#fff",
+			},
+			"Eliminar",
+		);
+		const actions = el("div", { class: "prefs-actions" }, modifyBtn, removeBtn);
+
 		const info = el(
 			"div",
-			{ style: "flex:1; color: #e8e8ee" },
-			el(
-				"div",
-				{
-					style:
-						"font-weight:700; font-size:1.05rem; margin-bottom:6px; color:#fff",
-				},
-				title,
-			),
-			createRatingStars(p.rating || 0),
+			{ class: "info-col", style: "color: #e8e8ee" },
+			titleEl,
+			ratingEl,
 			el(
 				"div",
 				{ style: "margin-top:6px; color:var(--muted,#cfcfcf)" },
 				p.notes || "",
 			),
-			el(
-				"div",
-				{ style: "margin-top:8px" },
-				el(
-					"a",
-					{ href: "/public/views/game-preferences/game-preferences.html" },
-					"Editar / Añadir más",
-				),
-			),
+			actions,
 		);
 
 		const card = el(
@@ -151,6 +169,48 @@ function renderPreferences(user) {
 			left,
 			info,
 		);
+		// wire up buttons (now under title, in the info column)
+		modifyBtn?.addEventListener("click", () => {
+			const q = encodeURIComponent(title);
+			location.href = `/public/views/game-preferences/game-preferences.html?q=${q}`;
+		});
+
+		removeBtn?.addEventListener("click", async () => {
+			if (!me || !me.email) {
+				location.href = "/public/views/login/login.html";
+				return;
+			}
+			if (!confirm(`Eliminar preferencia de ${title}?`)) return;
+			removeBtn.disabled = true;
+			removeBtn.textContent = "Eliminando...";
+			try {
+				const res = await fetch("/api/users/preference/remove", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email: me.email, gameId: g.appid ?? g._id }),
+				});
+				if (!res.ok) {
+					const txt = await res.text();
+					document.getElementById("status").textContent =
+						`Error ${res.status}: ${txt}`;
+					removeBtn.disabled = false;
+					removeBtn.textContent = "Eliminar";
+					return;
+				}
+				document.getElementById("status").textContent =
+					"Preferencia eliminada.";
+				const fresh = await loadProfileByEmail(me.email);
+				if (fresh) {
+					localStorage.setItem("user", JSON.stringify(fresh));
+					renderPreferences(fresh);
+				}
+			} catch (err) {
+				document.getElementById("status").textContent = "Error: " + String(err);
+			}
+			removeBtn.disabled = false;
+			removeBtn.textContent = "Eliminar";
+		});
+
 		list.appendChild(card);
 	}
 }

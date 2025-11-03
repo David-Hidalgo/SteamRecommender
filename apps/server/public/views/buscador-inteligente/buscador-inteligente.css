@@ -1,0 +1,125 @@
+/* Estilos para el buscador inteligente (tema oscuro, input redondeado) */
+:root {
+	--bg: #0b0b10;
+	--panel: #0f1116;
+	--muted: #9aa0a6;
+	--text: #e6e6ea;
+	--accent: #6ad1ff;
+}
+
+body {
+	padding: 1rem;
+	background: var(--bg);
+	color: var(--text);
+}
+
+.hero {
+	padding: 1rem 0;
+}
+
+.hero-inner {
+	max-width: 980px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.page-title {
+	font-size: clamp(1.25rem, 2.8vw, 2rem);
+	color: var(--text);
+	margin-bottom: 6px;
+}
+
+.subtitle {
+	font-size: 0.95rem;
+	color: var(--muted);
+	margin-bottom: 8px;
+}
+
+.search-bar-wrap {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+
+.search-input {
+	flex: 1 1 560px;
+	max-width: 760px;
+	padding: 14px 16px;
+	border-radius: 28px;
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.02),
+		rgba(0, 0, 0, 0.12)
+	);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	color: var(--text);
+	font-size: 1rem;
+	outline: none;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) inset;
+}
+
+.search-input::placeholder {
+	color: var(--muted);
+}
+
+.search-input:focus {
+	box-shadow:
+		0 6px 24px rgba(0, 0, 0, 0.6) inset,
+		0 0 0 4px rgba(106, 209, 255, 0.05);
+	border-color: rgba(106, 209, 255, 0.25);
+}
+
+.search-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border-radius: 999px;
+	background: linear-gradient(180deg, #1b1e24, #101217);
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	color: var(--text);
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.search-btn svg {
+	color: var(--accent);
+	opacity: 0.95;
+}
+
+.search-btn:active {
+	transform: translateY(1px);
+}
+
+/* Grid & cards same as index, slight spacing tweaks */
+.cards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1.15rem;
+	margin: 1.5rem 0;
+}
+
+/* Reuse styles for game-card instances (component defines most) */
+game-card {
+	display: block;
+}
+
+/* Empty state */
+.empty-msg {
+	text-align: center;
+	color: var(--muted);
+	padding: 1.2rem 0;
+}
+
+@media (max-width: 640px) {
+	.search-input {
+		max-width: 100%;
+	}
+	.search-btn {
+		padding: 9px 12px;
+	}
+}
