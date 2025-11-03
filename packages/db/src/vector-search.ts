@@ -5,6 +5,7 @@ import type { Document } from "mongoose";
 import { client } from "./index";
 import { Game, type GameType } from "./models/games.model";
 import { User } from "./models/auth.model";
+import { inspect } from "bun";
 
 const EMBEDDING_PROVIDER = (process.env.EMBEDDING_PROVIDER || "openai").toLowerCase();
 const VECTOR_INDEX_NAME = process.env.MONGODB_VECTOR_INDEX || "game_embedding_index";
@@ -376,16 +377,19 @@ export const recommendSimilarGamesForUser = async (
 	if (Object.keys(query).length === 0) {
 		throw new Error("Debes proporcionar userId o email para obtener recomendaciones personalizadas.");
 	}
-	const user = await User.findOne(query)
-		.select("gamePreferences wishlist")
-		.populate({
-			path: "gamePreferences.gameId",
-			select: "_id appid name embedding embeddingModel embeddingUpdatedAt",
-		})
-		.lean()
-		.exec();
+	console.log("Buscando usuario con query:", query);
+		const user = await User.findOne(query)
+			.select("gamePreferences wishlist")
+			.populate({
+				path: "gamePreferences.gameId",
+				select: "_id appid name embedding embeddingModel embeddingUpdatedAt",
+			})
+			.lean()
+			.exec();
+	console.log("Usuario encontrado:", user);
 	if (!user) return [];
 	const prefs = Array.isArray(user.gamePreferences) ? user.gamePreferences : [];
+	console.log("Preferencias del usuario encontradas:", inspect(prefs));
 	const minRating = params.minRating ?? MIN_USER_RATING;
 	const vectors: { vector: number[]; weight: number; appid?: number; gameId: mongoose.Types.ObjectId }[] = [];
 	for (const pref of prefs) {
@@ -417,6 +421,7 @@ export const recommendSimilarGamesForUser = async (
 			gameId,
 		});
 	}
+	console.log("Vectores de preferencias del usuario encontrados:", inspect(vectors));
 	if (vectors.length === 0) return [];
 	const dimension = vectors[0]?.vector?.length ?? 0;
 	if (dimension === 0) return [];

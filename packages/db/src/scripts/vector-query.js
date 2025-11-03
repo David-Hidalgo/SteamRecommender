@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import { getEmbedding } from "./get-embeddings.js";
 
 // MongoDB connection URI and options
-const client = new MongoClient(process.env.DATABASE_URL);
+const client = new MongoClient(process.env.MONGODB_URI);
 
 async function run() {
 	try {
@@ -12,30 +12,31 @@ async function run() {
 		// Specify the database and collection
 		const database = client.db("SteamRecommender");
 		const collection = database.collection("game");
-
+		
 		// Generate embedding for the search query
-		const queryEmbedding = await getEmbedding("Juego de guerra espacial con un master chief");
+		const queryEmbedding = await getEmbedding("pelota");
 
 		// Define the sample vector search pipeline
 		const pipeline = [
-		{
-			$vectorSearch: {
-			index: "vector_index",
-			queryVector: queryEmbedding,
-			path: "embedding",
-			exact: true,
-			limit: 5,
+			{
+				$vectorSearch: {
+					index: "vector_index",
+					queryVector: queryEmbedding,
+					path: "embedding",
+					exact: true,
+					limit: 5,
+				},
 			},
-		},
-		{
-			$project: {
-			_id: 0,
-			summary: 1,
-			score: {
-				$meta: "vectorSearchScore",
+			{
+				$project: {
+					_id: 1,
+					appid: 1,
+					name: 1,
+					score: { $meta: "vectorSearchScore" },
+					capsule: "$data.capsule_image",
+					release_date: "$data.release_date",
+				},
 			},
-			},
-		},
 		];
 
 		// run pipeline
@@ -43,7 +44,7 @@ async function run() {
 
 		// print results
 		for await (const doc of result) {
-		console.dir(JSON.stringify(doc));
+			console.dir(JSON.stringify(doc));
 		}
 	} finally {
 		await client.close();

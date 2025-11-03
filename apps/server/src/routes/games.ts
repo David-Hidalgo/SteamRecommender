@@ -220,7 +220,7 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 				},
 			)
 			.get(
-				"/vector-recommendations",
+				"/vector-recommendations/user",
 				async ({ query, status }) => {
 					const params = query as Record<string, string | undefined>;
 					const rawLimit = params?.limit ? Number(params.limit) : Number.NaN;
@@ -228,36 +228,18 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 						? Math.min(Math.max(Math.floor(rawLimit), 1), 50)
 						: 10;
 					try {
-						if (params?.userId || params?.email) {
-							return await recommendSimilarGamesForUser({
-								userId: params.userId,
-								email: params.email,
-								limit,
+						if (!params?.userId && !params?.email) {
+							return status(400, {
+								message: "Proporciona userId o email para obtener recomendaciones de usuario.",
 							});
 						}
-						if (params?.appid || params?.gameId) {
-							const identifier = params.appid ?? params.gameId;
-							const numeric = identifier && !Number.isNaN(Number(identifier))
-								? Number(identifier)
-								: undefined;
-							return await recommendSimilarGamesForApp({
-								appid: numeric ?? identifier,
-								gameId: params.gameId,
-								limit,
-							});
-						}
-						if (params?.text) {
-							return await recommendSimilarGamesForText({
-								text: params.text,
-								limit,
-							});
-						}
-						return status(400, {
-							message:
-								"Proporciona userId/email, appid/gameId o text para obtener recomendaciones.",
+						return await recommendSimilarGamesForUser({
+							userId: params.userId,
+							email: params.email,
+							limit,
 						});
 					} catch (error) {
-						console.error("Error generating vector recommendations", error);
+						console.error("Error generating user vector recommendations", error);
 						return status(503, {
 							message: "No se pudieron generar recomendaciones en este momento.",
 							detail: error instanceof Error ? error.message : String(error),
@@ -268,8 +250,113 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					query: t.Object({
 						userId: t.Optional(t.String()),
 						email: t.Optional(t.String()),
+						limit: t.Optional(t.String()),
+					}),
+					response: {
+						200: t.Array(
+							t.Object({
+								_id: t.String(),
+								appid: t.Optional(t.Number()),
+								name: t.Optional(t.String()),
+								score: t.Number(),
+								capsule: t.Optional(t.String()),
+								release_date: t.Optional(t.Any()),
+								vectorIndex: t.String(),
+							}),
+						),
+						400: t.Object({ message: t.String() }),
+						503: t.Object({
+							message: t.String(),
+							detail: t.Optional(t.String()),
+						}),
+					},
+				},
+			)
+			.get(
+				"/vector-recommendations/app",
+				async ({ query, status }) => {
+					const params = query as Record<string, string | undefined>;
+					const rawLimit = params?.limit ? Number(params.limit) : Number.NaN;
+					const limit = Number.isFinite(rawLimit)
+						? Math.min(Math.max(Math.floor(rawLimit), 1), 50)
+						: 10;
+					try {
+						if (!params?.appid && !params?.gameId) {
+							return status(400, {
+								message: "Proporciona appid o gameId para obtener recomendaciones por juego.",
+							});
+						}
+						const identifier = params.appid ?? params.gameId;
+						const numeric = identifier && !Number.isNaN(Number(identifier))
+							? Number(identifier)
+							: undefined;
+						return await recommendSimilarGamesForApp({
+							appid: numeric ?? identifier,
+							gameId: params.gameId,
+							limit,
+						});
+					} catch (error) {
+						console.error("Error generating app vector recommendations", error);
+						return status(503, {
+							message: "No se pudieron generar recomendaciones en este momento.",
+							detail: error instanceof Error ? error.message : String(error),
+						});
+					}
+				},
+				{
+					query: t.Object({
 						appid: t.Optional(t.String()),
 						gameId: t.Optional(t.String()),
+						limit: t.Optional(t.String()),
+					}),
+					response: {
+						200: t.Array(
+							t.Object({
+								_id: t.String(),
+								appid: t.Optional(t.Number()),
+								name: t.Optional(t.String()),
+								score: t.Number(),
+								capsule: t.Optional(t.String()),
+								release_date: t.Optional(t.Any()),
+								vectorIndex: t.String(),
+							}),
+						),
+						400: t.Object({ message: t.String() }),
+						503: t.Object({
+							message: t.String(),
+							detail: t.Optional(t.String()),
+						}),
+					},
+				},
+			)
+			.get(
+				"/vector-recommendations/text",
+				async ({ query, status }) => {
+					const params = query as Record<string, string | undefined>;
+					const rawLimit = params?.limit ? Number(params.limit) : Number.NaN;
+					const limit = Number.isFinite(rawLimit)
+						? Math.min(Math.max(Math.floor(rawLimit), 1), 50)
+						: 10;
+					try {
+						if (!params?.text) {
+							return status(400, {
+								message: "Proporciona text para obtener recomendaciones basadas en texto.",
+							});
+						}
+						return await recommendSimilarGamesForText({
+							text: params.text,
+							limit,
+						});
+					} catch (error) {
+						console.error("Error generating text vector recommendations", error);
+						return status(503, {
+							message: "No se pudieron generar recomendaciones en este momento.",
+							detail: error instanceof Error ? error.message : String(error),
+						});
+					}
+				},
+				{
+					query: t.Object({
 						text: t.Optional(t.String()),
 						limit: t.Optional(t.String()),
 					}),
