@@ -4,11 +4,15 @@ const API_KEY = process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY;
 const MODEL_NAME = process.env.GOOGLE_EMBEDDING_MODEL;
 
 if (!API_KEY) {
-	throw new Error("No se definio GOOGLE_API_KEY o GEMINI_API_KEY para generar embeddings.");
+	throw new Error(
+		"No se definio GOOGLE_API_KEY o GEMINI_API_KEY para generar embeddings.",
+	);
 }
 
 if (!MODEL_NAME) {
-	throw new Error("No se definio GOOGLE_EMBEDDING_MODEL para generar embeddings.");
+	throw new Error(
+		"No se definio GOOGLE_EMBEDDING_MODEL para generar embeddings.",
+	);
 }
 
 const googleGenAI = new GoogleGenAI({ apiKey: API_KEY });

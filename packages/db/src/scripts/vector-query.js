@@ -12,7 +12,7 @@ async function run() {
 		// Specify the database and collection
 		const database = client.db("SteamRecommender");
 		const collection = database.collection("game");
-		
+
 		// Generate embedding for the search query
 		const queryEmbedding = await getEmbedding("pelota");
 
@@ -29,13 +29,13 @@ async function run() {
 			},
 			{
 				$project: {
-					_id: 1,							
-					appid:1,
-					name:1,
+					_id: 1,
+					appid: 1,
+					name: 1,
 					score: { $meta: "vectorSearchScore" },
 					capsule: "$data.capsule_image",
 					release_date: "$data.release_date",
-					vectorIndex: "$data.vectorIndex"
+					vectorIndex: "$data.vectorIndex",
 				},
 			},
 		];

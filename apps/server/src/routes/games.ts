@@ -6,12 +6,12 @@ import {
 	recommendGamesByPublisher,
 	recommendSimilarGamesByContent,
 } from "@SteamRecommender/db/recommender";
-import { Elysia, t } from "elysia";
 import {
 	recommendSimilarGamesForApp,
-	recommendSimilarGamesForUser,
 	recommendSimilarGamesForText,
+	recommendSimilarGamesForUser,
 } from "@SteamRecommender/db/vector-search";
+import { Elysia, t } from "elysia";
 // Intentamos usar el cliente nativo exportado por el paquete db
 
 // Games plugin: routes that do not require user context
@@ -230,7 +230,8 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					try {
 						if (!params?.userId && !params?.email) {
 							return status(400, {
-								message: "Proporciona userId o email para obtener recomendaciones de usuario.",
+								message:
+									"Proporciona userId o email para obtener recomendaciones de usuario.",
 							});
 						}
 						return await recommendSimilarGamesForUser({
@@ -239,9 +240,13 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 							limit,
 						});
 					} catch (error) {
-						console.error("Error generating user vector recommendations", error);
+						console.error(
+							"Error generating user vector recommendations",
+							error,
+						);
 						return status(503, {
-							message: "No se pudieron generar recomendaciones en este momento.",
+							message:
+								"No se pudieron generar recomendaciones en este momento.",
 							detail: error instanceof Error ? error.message : String(error),
 						});
 					}
@@ -283,13 +288,15 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					try {
 						if (!params?.appid && !params?.gameId) {
 							return status(400, {
-								message: "Proporciona appid o gameId para obtener recomendaciones por juego.",
+								message:
+									"Proporciona appid o gameId para obtener recomendaciones por juego.",
 							});
 						}
 						const identifier = params.appid ?? params.gameId;
-						const numeric = identifier && !Number.isNaN(Number(identifier))
-							? Number(identifier)
-							: undefined;
+						const numeric =
+							identifier && !Number.isNaN(Number(identifier))
+								? Number(identifier)
+								: undefined;
 						return await recommendSimilarGamesForApp({
 							appid: numeric ?? identifier,
 							gameId: params.gameId,
@@ -298,7 +305,8 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					} catch (error) {
 						console.error("Error generating app vector recommendations", error);
 						return status(503, {
-							message: "No se pudieron generar recomendaciones en este momento.",
+							message:
+								"No se pudieron generar recomendaciones en este momento.",
 							detail: error instanceof Error ? error.message : String(error),
 						});
 					}
@@ -340,7 +348,8 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 					try {
 						if (!params?.text) {
 							return status(400, {
-								message: "Proporciona text para obtener recomendaciones basadas en texto.",
+								message:
+									"Proporciona text para obtener recomendaciones basadas en texto.",
 							});
 						}
 						return await recommendSimilarGamesForText({
@@ -348,9 +357,13 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 							limit,
 						});
 					} catch (error) {
-						console.error("Error generating text vector recommendations", error);
+						console.error(
+							"Error generating text vector recommendations",
+							error,
+						);
 						return status(503, {
-							message: "No se pudieron generar recomendaciones en este momento.",
+							message:
+								"No se pudieron generar recomendaciones en este momento.",
 							detail: error instanceof Error ? error.message : String(error),
 						});
 					}
@@ -379,5 +392,5 @@ export const plugin = <T extends string>(config: { prefix: T }) =>
 						}),
 					},
 				},
-			)
+			),
 	);

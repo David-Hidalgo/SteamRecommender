@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import { getEmbedding } from "./get-embeddings.js";
+
 // import { convertEmbeddingsToBSON } from './convert-embeddings.js';
 
 async function run() {
@@ -27,9 +28,9 @@ async function run() {
 				// Uncomment the following lines to convert the generated embedding into BSON format
 				// const bsonEmbedding = await convertEmbeddingsToBSON([embedding]); // Since convertEmbeddingsToBSON is designed to handle arrays
 				// embedding = bsonEmbedding; // Use BSON embedding instead of the original float32 embedding
-				
+
 				// console.log(embedding);
-				
+
 				// Add the embedding to an array of update operations
 				updateDocuments.push({
 					updateOne: {
@@ -38,7 +39,6 @@ async function run() {
 					},
 				});
 				console.log(`document updated: ${doc._id}`);
-
 			}),
 		);
 

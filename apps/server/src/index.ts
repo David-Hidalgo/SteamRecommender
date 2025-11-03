@@ -1,11 +1,11 @@
 import "dotenv/config";
 import { auth } from "@SteamRecommender/auth";
+import { ensureGameVectorIndex } from "@SteamRecommender/db/vector-search";
 import { cors } from "@elysiajs/cors";
 import { html } from "@elysiajs/html";
 import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
 import { Elysia } from "elysia";
-import { ensureGameVectorIndex } from "@SteamRecommender/db/vector-search";
 import index from "./../public/index.html" with { type: "text" };
 import { plugin as gamesPlugin } from "./routes/games";
 import { plugin as htmlPlugin } from "./routes/html";
